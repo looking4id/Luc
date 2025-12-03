@@ -1,0 +1,5 @@
+{
+  "name": "mykanban",
+  "description": "A high-fidelity clone of a professional project management Kanban board featuring detailed task cards, filtering, and a complex dual-sidebar layout.",
+  "requestFramePermissions": []
+}
