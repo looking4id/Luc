@@ -83,3 +83,28 @@ export interface SavedView {
   type: 'system' | 'personal' | 'public';
   filters: Partial<FilterState>;
 }
+
+// Ruoyi-Vue-Pro Standard Response Wrapper
+export interface ApiResponse<T> {
+  code: number;
+  data: T;
+  msg: string;
+}
+
+export interface WorkbenchData {
+  projects: Project[];
+  myTasks: Task[];
+  stats: {
+    todo: number;
+    done: number;
+    overdue: number;
+    efficiency: number;
+  };
+  activities: {
+    id: string;
+    user: User;
+    action: string;
+    target: string;
+    time: string;
+  }[];
+}

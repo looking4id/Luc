@@ -5,6 +5,7 @@ import { TopHeader } from './components/TopHeader';
 import { FilterBar } from './components/FilterBar';
 import { KanbanBoard } from './components/KanbanBoard';
 import { ProjectList } from './components/ProjectList';
+import { Workbench } from './components/Workbench';
 import { FilterState, ViewType, SavedView, TaskType } from './types';
 
 const App = () => {
@@ -19,7 +20,7 @@ const App = () => {
     creatorId: null
   };
 
-  const [activeMainItem, setActiveMainItem] = useState('工作项'); // Controls the main module (Projects vs Work Items)
+  const [activeMainItem, setActiveMainItem] = useState('工作台'); // Controls the main module
   
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [viewType, setViewType] = useState<ViewType>('kanban');
@@ -80,6 +81,61 @@ const App = () => {
       setIsCreateModalOpen(true);
   };
 
+  // Render Logic based on Main Sidebar
+  const renderContent = () => {
+    switch (activeMainItem) {
+      case '工作台':
+        return <Workbench />;
+      
+      case '项目':
+        return <ProjectList />;
+      
+      case '工作项':
+      default:
+        return (
+          <div className="flex flex-1 overflow-hidden">
+            {/* Secondary Sidebar */}
+            <SecondarySidebar 
+                activeView={activeView} 
+                onViewSelect={handleViewSelect}
+                customViews={customViews}
+                onAddView={handleAddCustomView}
+            />
+            
+            {/* Main Work Area */}
+            <div className="flex-1 flex flex-col overflow-hidden relative">
+              {/* Top Header */}
+              <TopHeader 
+                selectedType={filters.type}
+                onTypeChange={(type) => {
+                    setFilters(prev => ({ ...prev, type }));
+                }}
+              />
+              
+              {/* Toolbar/Filters */}
+              <FilterBar 
+                filters={filters} 
+                setFilters={setFilters} 
+                viewType={viewType}
+                setViewType={setViewType}
+                onTriggerCreate={handleTriggerCreate}
+              />
+              
+              {/* Kanban Board / List View */}
+              <KanbanBoard 
+                filters={filters} 
+                viewType={viewType}
+                isCreateModalOpen={isCreateModalOpen}
+                setIsCreateModalOpen={setIsCreateModalOpen}
+                createModalType={createModalType}
+                setCreateModalType={setCreateModalType}
+              />
+            </div>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-white">
       {/* Primary Sidebar */}
@@ -89,50 +145,7 @@ const App = () => {
       />
       
       {/* App Content Switcher */}
-      {activeMainItem === '项目' ? (
-        <ProjectList />
-      ) : (
-        /* Work Items View (Existing Logic) */
-        <div className="flex flex-1 overflow-hidden">
-          {/* Secondary Sidebar */}
-          <SecondarySidebar 
-              activeView={activeView} 
-              onViewSelect={handleViewSelect}
-              customViews={customViews}
-              onAddView={handleAddCustomView}
-          />
-          
-          {/* Main Work Area */}
-          <div className="flex-1 flex flex-col overflow-hidden relative">
-            {/* Top Header */}
-            <TopHeader 
-              selectedType={filters.type}
-              onTypeChange={(type) => {
-                  setFilters(prev => ({ ...prev, type }));
-              }}
-            />
-            
-            {/* Toolbar/Filters */}
-            <FilterBar 
-              filters={filters} 
-              setFilters={setFilters} 
-              viewType={viewType}
-              setViewType={setViewType}
-              onTriggerCreate={handleTriggerCreate}
-            />
-            
-            {/* Kanban Board / List View */}
-            <KanbanBoard 
-              filters={filters} 
-              viewType={viewType}
-              isCreateModalOpen={isCreateModalOpen}
-              setIsCreateModalOpen={setIsCreateModalOpen}
-              createModalType={createModalType}
-              setCreateModalType={setCreateModalType}
-            />
-          </div>
-        </div>
-      )}
+      {renderContent()}
     </div>
   );
 };
