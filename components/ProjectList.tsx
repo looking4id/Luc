@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Search, 
@@ -175,7 +174,7 @@ export const ProjectList: React.FC = () => {
                                      <div className={`p-1.5 rounded bg-opacity-10 ${project.iconColor.replace('text-', 'bg-')}`}>
                                         <Code2 size={18} className={project.iconColor} />
                                      </div>
-                                     <span className="font-medium text-slate-800">{project.name}</span>
+                                     <span className="text-sm font-medium text-slate-800">{project.name}</span>
                                      {project.isStar && <Star size={14} className="text-slate-400 fill-slate-100" />}
                                  </div>
                              </td>

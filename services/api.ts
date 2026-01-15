@@ -1,4 +1,3 @@
-
 import { MOCK_PROJECTS, MOCK_USERS, MOCK_COLUMNS } from '../constants';
 import { Project, Task, WorkbenchData, ApiResponse, TaskType, Priority } from '../types';
 
@@ -7,78 +6,73 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Helper to wrap response in Ruoyi format
 const success = <T>(data: T): ApiResponse<T> => ({
-  code: 0, // Ruoyi uses 0 for success usually, or 200
+  code: 0, 
   data,
   msg: 'success'
 });
 
-// "Database" state
-let localProjects = [...MOCK_PROJECTS];
-let localColumns = [...MOCK_COLUMNS];
-
-// Flatten tasks from columns for easier manipulation
-const getAllTasks = () => localColumns.flatMap(col => col.tasks);
+/**
+ * Service: Auth
+ */
+export const AuthService = {
+  login: async (username: string, password: string): Promise<ApiResponse<{ token: string; user: any }>> => {
+    await delay(800);
+    if (username === 'admin' && password === '123456') {
+      return success({
+        token: 'mock-jwt-token',
+        user: MOCK_USERS[0]
+      });
+    }
+    // Simple mock error
+    return { code: 500, data: null as any, msg: '账号或密码错误 (提示: admin/123456)' };
+  }
+};
 
 /**
  * Service: Project Management
- * Simulating: /bpm/project/*
  */
 export const ProjectService = {
   list: async (): Promise<ApiResponse<Project[]>> => {
     await delay(300);
-    return success(localProjects);
+    return success([...MOCK_PROJECTS]);
   },
 
   getById: async (id: string): Promise<ApiResponse<Project | undefined>> => {
     await delay(200);
-    const project = localProjects.find(p => p.id === id);
+    const project = MOCK_PROJECTS.find(p => p.id === id);
     return success(project);
   }
 };
 
 /**
  * Service: Task Management
- * Simulating: /bpm/task/*
  */
 export const TaskService = {
   list: async (): Promise<ApiResponse<Task[]>> => {
     await delay(300);
-    return success(getAllTasks());
+    const all = MOCK_COLUMNS.flatMap(col => col.tasks);
+    return success(all);
   },
 
   getMyTasks: async (userId: string): Promise<ApiResponse<Task[]>> => {
     await delay(300);
-    const all = getAllTasks();
-    // In a real backend, this would utilize SQL WHERE clauses
+    const all = MOCK_COLUMNS.flatMap(col => col.tasks);
     const myTasks = all.filter(t => t.assignee?.id === userId || t.creatorId === userId);
     return success(myTasks);
-  },
-
-  create: async (task: Task): Promise<ApiResponse<boolean>> => {
-    await delay(400);
-    // Add to 'todo' column by default in our mock DB
-    const colIndex = localColumns.findIndex(c => c.id === 'todo');
-    if (colIndex > -1) {
-      localColumns[colIndex].tasks.unshift(task);
-      localColumns[colIndex].count++;
-    }
-    return success(true);
   }
 };
 
 /**
  * Service: Workbench Dashboard
- * Simulating: Aggregated data for /system/dashboard/workbench
  */
 export const WorkbenchService = {
   getData: async (userId: string): Promise<ApiResponse<WorkbenchData>> => {
-    await delay(600); // Simulate complex query
+    await delay(600);
     
-    const allTasks = getAllTasks();
-    const myTasks = allTasks.filter(t => t.assignee?.id === userId && t.statusColor !== 'bg-green-500'); // Assuming green is done
+    const allTasks = MOCK_COLUMNS.flatMap(col => col.tasks);
+    const myTasks = allTasks.filter(t => t.assignee?.id === userId && t.statusColor !== 'bg-green-500');
     const doneTasks = allTasks.filter(t => t.assignee?.id === userId && t.statusColor === 'bg-green-500');
     
-    // Mock Activities
     const activities = [
       { id: '1', user: MOCK_USERS[0], action: '更新了需求', target: '支持多人扫码加入点餐', time: '10分钟前' },
       { id: '2', user: MOCK_USERS[1], action: '创建了任务', target: '后端API性能优化', time: '30分钟前' },
@@ -87,8 +81,8 @@ export const WorkbenchService = {
     ];
 
     return success({
-      projects: localProjects,
-      myTasks: myTasks.slice(0, 5), // Limit 5
+      projects: MOCK_PROJECTS,
+      myTasks: myTasks.slice(0, 5),
       stats: {
         todo: myTasks.length,
         done: doneTasks.length,
