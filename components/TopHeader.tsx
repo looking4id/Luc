@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, Bell, HelpCircle, Plus, AiIcon } from './Icons';
+import { Bell, HelpCircle, Plus, AiIcon } from './Icons';
 import { TaskType } from '../types';
 
 interface TopHeaderProps {
@@ -10,63 +10,47 @@ interface TopHeaderProps {
 
 export const TopHeader: React.FC<TopHeaderProps> = ({ selectedType, onTypeChange }) => {
   const tabs = [
-    { label: '所有', value: null },
+    { label: '全部', value: null },
     { label: '需求', value: TaskType.Requirement },
     { label: '任务', value: TaskType.Task },
     { label: '缺陷', value: TaskType.Defect }
   ];
 
   return (
-    <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 shadow-sm flex-shrink-0 z-10">
-      {/* Breadcrumbs */}
-      <div className="flex items-center gap-4">
-        <div className="text-slate-800 font-bold text-sm flex items-center gap-2">
-          <span>工作项</span>
-        </div>
-        <div className="flex space-x-6 text-sm font-medium text-slate-500 ml-6">
+    <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 z-30">
+      <div className="flex items-center gap-10 h-full">
+        <span className="text-slate-900 font-bold text-base">工作项</span>
+        <div className="flex h-full gap-8">
             {tabs.map(tab => (
               <button 
                 key={tab.label}
                 onClick={() => onTypeChange(tab.value)}
-                className={`px-1 py-4 -mb-4 transition-colors ${
+                className={`relative px-1 h-full text-sm font-medium transition-all ${
                     selectedType === tab.value 
-                    ? 'text-red-600 border-b-2 border-red-600 font-medium' 
+                    ? 'text-blue-600' 
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
                 {tab.label}
+                {selectedType === tab.value && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                )}
               </button>
             ))}
         </div>
       </div>
 
-      {/* Utilities */}
-      <div className="flex items-center gap-4">
-         <div className="relative">
-             <input 
-                type="text" 
-                placeholder="搜索..." 
-                className="pl-3 pr-8 py-1.5 text-sm border border-slate-300 rounded-md bg-slate-50 w-48 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-             />
-             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[12px] border border-slate-200 rounded px-1">/</span>
+      <div className="flex items-center gap-5">
+         <div className="flex items-center gap-4 text-slate-400">
+             <AiIcon />
+             <div className="w-px h-4 bg-slate-200"></div>
+             <Bell size={18} className="cursor-pointer hover:text-slate-600" />
+             <HelpCircle size={18} className="cursor-pointer hover:text-slate-600" />
          </div>
-         
-         <div className="flex items-center gap-3 text-slate-500">
-             <div className="relative cursor-pointer hover:text-slate-700">
-                 <Bell size={20} />
-                 <span className="absolute -top-1 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-             </div>
-             <div className="cursor-pointer hover:scale-105 transition-transform">
-                <AiIcon />
-             </div>
-             <div className="cursor-pointer hover:text-slate-700">
-                 <HelpCircle size={20} />
-             </div>
-             <div className="w-8 h-8 rounded-full border border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-slate-400 text-slate-400">
-                 <Plus size={18} />
-             </div>
-             <div className="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center text-[12px] font-bold border-2 border-white shadow-sm cursor-pointer">
-                 Lo
+         <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+             <span className="text-sm font-medium text-slate-700">王亮</span>
+             <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                 王
              </div>
          </div>
       </div>

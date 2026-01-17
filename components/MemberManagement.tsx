@@ -41,10 +41,10 @@ export const MemberManagement = () => {
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <input type="text" placeholder="搜索姓名/账号..." className="pl-8 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 w-56" />
+              <input type="text" placeholder="搜索姓名/账号..." className="pl-8 pr-4 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 w-56" />
               <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
             </div>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-600 hover:bg-slate-50">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50">
               <Filter size={14} /> 筛选
             </button>
           </div>
@@ -53,7 +53,7 @@ export const MemberManagement = () => {
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-slate-50 border-b border-slate-100">
-              <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+              <tr className="text-sm font-bold text-slate-400 uppercase tracking-widest">
                 <th className="py-4 px-6 w-12"><input type="checkbox" className="rounded" /></th>
                 <th className="py-4 px-4">姓名</th>
                 <th className="py-4 px-4">账号/邮箱</th>
@@ -74,7 +74,7 @@ export const MemberManagement = () => {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold text-slate-700">{user.name}</span>
-                        <span className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Joined 2024</span>
+                        <span className="text-[11px] text-slate-400 uppercase font-bold tracking-tighter">Joined 2024</span>
                       </div>
                     </div>
                   </td>
@@ -87,7 +87,7 @@ export const MemberManagement = () => {
                     </span>
                   </td>
                   <td className="py-4 px-4 text-slate-600 font-medium">技术部 / 前端组</td>
-                  <td className="py-4 px-4 text-slate-400 text-xs font-mono">2025-08-15 14:22</td>
+                  <td className="py-4 px-4 text-slate-400 font-mono">2025-08-15 14:22</td>
                   <td className="py-4 px-6 text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="设置权限"><ShieldAlert size={14} /></button>

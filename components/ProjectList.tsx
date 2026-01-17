@@ -1,21 +1,8 @@
+
 import React from 'react';
 import { 
-  Search, 
-  Bell, 
-  HelpCircle, 
-  Plus, 
-  AiIcon, 
-  LayoutGrid, 
-  Filter, 
-  ArrowUpDown, 
-  Maximize2,
-  MoreHorizontal,
-  ChevronDown,
-  Code2,
-  Users,
-  Box,
-  Star,
-  Activity
+  Search, Bell, HelpCircle, Plus, AiIcon, LayoutGrid, Filter, 
+  ArrowUpDown, MoreHorizontal, ChevronDown, Code2, Users, Star
 } from './Icons';
 import { MOCK_PROJECTS } from '../constants';
 import { Project } from '../types';
@@ -26,41 +13,26 @@ interface ProjectListProps {
 
 export const ProjectList: React.FC<ProjectListProps> = ({ onProjectClick }) => {
   return (
-    <div className="flex flex-col h-full bg-white flex-1 overflow-hidden">
-      {/* Top Global Header (Specific to Project View based on screenshot) */}
-      <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 shadow-sm flex-shrink-0 z-10">
-        <div className="flex items-center gap-4">
-           <div className="flex items-center gap-2 text-slate-700 font-bold text-lg">
-             <span>项目</span>
-           </div>
-        </div>
+    <div className="flex flex-col h-full bg-slate-50/30 flex-1 overflow-hidden">
+      {/* Top Header */}
+      <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 z-10">
+        <h1 className="text-lg font-bold text-slate-800">项目中心</h1>
 
-        {/* Utilities */}
         <div className="flex items-center gap-4">
-           <div className="relative">
+           <div className="relative group">
                <input 
                   type="text" 
-                  placeholder="搜索..." 
-                  className="pl-3 pr-8 py-1.5 text-sm border border-slate-300 rounded-md bg-white w-56 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                  placeholder="全局搜索..." 
+                  className="pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-lg bg-slate-50 w-56 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all outline-none"
                />
-               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs border border-slate-200 rounded px-1">/</span>
+               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
            </div>
            
-           <div className="flex items-center gap-3 text-slate-500">
-               <div className="relative cursor-pointer hover:text-slate-700">
-                   <Bell size={20} />
-                   <span className="absolute -top-1 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-               </div>
-               <div className="cursor-pointer hover:scale-105 transition-transform">
-                  <AiIcon />
-               </div>
-               <div className="cursor-pointer hover:text-slate-700">
-                   <HelpCircle size={20} />
-               </div>
-               <div className="w-8 h-8 rounded-full border border-dashed border-slate-300 flex items-center justify-center cursor-pointer hover:border-slate-400 text-slate-400">
-                   <Plus size={18} />
-               </div>
-               <div className="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm cursor-pointer">
+           <div className="flex items-center gap-4 border-l border-slate-100 pl-4">
+               <AiIcon />
+               <Bell size={18} className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors" />
+               <HelpCircle size={18} className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors" />
+               <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-md shadow-blue-100 cursor-pointer">
                    Lo
                </div>
            </div>
@@ -68,150 +40,121 @@ export const ProjectList: React.FC<ProjectListProps> = ({ onProjectClick }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto p-6">
-        {/* Header Row */}
-        <div className="flex items-center justify-between mb-6">
-            <div>
-               <h1 className="text-2xl font-bold text-slate-800 mb-2">项目</h1>
-               <div className="text-sm text-slate-500">全部项目 ({MOCK_PROJECTS.length})</div>
+      <div className="flex-1 overflow-auto p-8 custom-scrollbar">
+        <div className="flex items-center justify-between mb-8">
+            <div className="flex items-baseline gap-3">
+               <h2 className="text-2xl font-bold text-slate-800 tracking-tight">全部项目</h2>
+               <span className="text-sm font-medium text-slate-400">({MOCK_PROJECTS.length})</span>
             </div>
             <div className="flex items-center gap-3">
-               <button className="px-3 py-1.5 bg-white border border-slate-300 text-slate-700 rounded hover:bg-slate-50 text-sm">
-                  项目拓扑图
+               <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 text-sm font-bold shadow-sm transition-all">
+                  项目拓扑
                </button>
-               <button className="px-3 py-1.5 bg-red-700 text-white rounded hover:bg-red-800 text-sm flex items-center gap-1 shadow-sm">
+               <button className="px-5 py-2 bg-rose-600 text-white rounded-lg text-sm font-bold hover:bg-rose-700 shadow-lg shadow-rose-100 flex items-center gap-2 transition-all active:scale-95">
                   <Plus size={16} />
                   新建项目
                </button>
             </div>
         </div>
 
-        {/* Filters Toolbar */}
-        <div className="bg-slate-50/50 p-2 rounded-lg border border-slate-200 flex items-center justify-between mb-4">
-             <div className="flex items-center gap-2">
-                 {/* Status Dropdown */}
-                 <div className="relative group">
-                     <button className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded text-sm text-slate-700 hover:border-slate-300">
-                         <span className="font-medium">开始</span>
-                         <ChevronDown size={14} className="text-slate-400" />
-                     </button>
-                 </div>
-                 
-                 {/* Manager Dropdown */}
-                 <div className="relative group">
-                     <button className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded text-sm text-slate-500 hover:text-slate-700 hover:border-slate-300">
-                         <span>项目负责人</span>
-                         <ChevronDown size={14} className="text-slate-400" />
-                     </button>
-                 </div>
-
-                 {/* Type Dropdown */}
-                 <div className="relative group">
-                     <button className="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 rounded text-sm text-slate-500 hover:text-slate-700 hover:border-slate-300">
-                         <span>项目类型</span>
-                         <ChevronDown size={14} className="text-slate-400" />
-                     </button>
-                 </div>
-
-                 {/* Search Input */}
+        {/* Toolbar */}
+        <div className="bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between mb-6 shadow-sm">
+             <div className="flex items-center gap-3">
+                 <button className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition-all">
+                     <span>开始</span>
+                     <ChevronDown size={14} className="text-slate-300" />
+                 </button>
                  <div className="relative">
                      <input 
                         type="text" 
-                        placeholder="请输入关键字" 
-                        className="pl-3 pr-8 py-1.5 text-sm border border-slate-200 rounded w-48 focus:outline-none focus:border-blue-500"
+                        placeholder="输入项目名或关键字" 
+                        className="pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-lg w-64 outline-none focus:border-blue-400 transition-all"
                      />
-                     <Search size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400" />
+                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                  </div>
-
-                 <button className="text-sm text-slate-500 hover:text-slate-700 px-2">清空</button>
+                 <button className="text-sm font-bold text-slate-400 hover:text-blue-600 px-2">清空</button>
              </div>
 
-             <div className="flex items-center gap-4 text-slate-500 text-sm">
-                 <div className="flex items-center gap-1 cursor-pointer hover:text-slate-700">
-                     <span>请选择视图</span>
-                     <ChevronDown size={14} />
-                 </div>
-                 <div className="flex items-center gap-1 cursor-pointer hover:text-slate-700">
+             <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-1.5 text-sm font-bold text-slate-500 cursor-pointer hover:text-slate-800">
                      <Filter size={14} />
                      <span>筛选</span>
-                     <span className="bg-slate-200 text-xs px-1.5 rounded-full">1</span>
                  </div>
-                 <div className="flex items-center gap-1 cursor-pointer hover:text-slate-700">
-                     <ArrowUpDown size={14} />
-                 </div>
-                 <div className="flex items-center gap-1 cursor-pointer hover:text-slate-700">
-                     <span>导出</span>
-                 </div>
+                 <ArrowUpDown size={14} className="text-slate-300 cursor-pointer hover:text-slate-800" />
+                 <LayoutGrid size={14} className="text-slate-300 cursor-pointer hover:text-slate-800" />
              </div>
         </div>
 
-        {/* Project Table */}
-        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+        {/* Table */}
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
              <table className="w-full text-left">
                  <thead>
-                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-semibold">
-                         <th className="py-3 px-4 w-10"></th>
-                         <th className="py-3 px-4">项目编号</th>
-                         <th className="py-3 px-4">项目名称</th>
-                         <th className="py-3 px-4 w-40">活跃趋势</th>
-                         <th className="py-3 px-4">项目状态</th>
-                         <th className="py-3 px-4">项目类型</th>
-                         <th className="py-3 px-4">成员数量</th>
-                         <th className="py-3 px-4">项目负责人</th>
-                         <th className="py-3 px-4">仓库数量</th>
-                         <th className="py-3 px-4 text-right">操作</th>
+                     <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-400 text-sm font-bold uppercase tracking-widest">
+                         <th className="py-4 px-6 w-4"></th>
+                         <th className="py-4 px-4 w-28">编号</th>
+                         <th className="py-4 px-4">项目名称</th>
+                         <th className="py-4 px-4 w-40 text-center">活跃度</th>
+                         <th className="py-4 px-4 w-28">状态</th>
+                         <th className="py-4 px-4 w-28">负责人</th>
+                         <th className="py-4 px-4 w-20 text-center">成员</th>
+                         <th className="py-4 px-6 text-right">操作</th>
                      </tr>
                  </thead>
-                 <tbody>
+                 <tbody className="divide-y divide-slate-50 text-sm">
                      {MOCK_PROJECTS.map((project) => (
                          <tr 
                              key={project.id} 
-                             className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
+                             className="hover:bg-slate-50/50 transition-colors cursor-pointer group"
                              onClick={() => onProjectClick && onProjectClick(project)}
                          >
-                             <td className="py-4 px-4 text-center">
-                                 <div className={`w-1.5 h-10 -my-2 rounded-r ${project.id === 'p1' ? 'bg-green-500' : ''}`}></div>
+                             <td className="py-5 px-6">
+                                 <div className={`w-1 h-10 rounded-full ${project.id === 'p1' ? 'bg-emerald-500' : 'bg-blue-500'}`}></div>
                              </td>
-                             <td className="py-4 px-4 text-sm text-slate-600">{project.code}</td>
-                             <td className="py-4 px-4">
-                                 <div className="flex items-center gap-2">
-                                     <div className={`p-1.5 rounded bg-opacity-10 ${project.iconColor.replace('text-', 'bg-')}`}>
-                                        <Code2 size={18} className={project.iconColor} />
+                             <td className="py-5 px-4 font-mono text-slate-400 font-bold">{project.code}</td>
+                             <td className="py-5 px-4">
+                                 <div className="flex items-center gap-3">
+                                     <div className={`p-2 rounded-xl bg-slate-50 group-hover:bg-white transition-colors shadow-sm ${project.iconColor}`}>
+                                        <Code2 size={20} />
                                      </div>
-                                     <span className="text-sm font-medium text-slate-800 hover:text-blue-600 transition-colors">{project.name}</span>
-                                     {project.isStar && <Star size={14} className="text-slate-400 fill-slate-100" />}
+                                     <div className="flex flex-col">
+                                         <span className="font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{project.name}</span>
+                                         <span className="text-[11px] font-medium text-slate-400 uppercase tracking-tighter mt-0.5">{project.type}</span>
+                                     </div>
+                                     {project.isStar && <Star size={14} className="text-amber-400 fill-amber-400" />}
                                  </div>
                              </td>
-                             <td className="py-4 px-4">
-                                 {/* Simple Sparkline SVG */}
-                                 <svg width="100" height="30" className="stroke-blue-400 fill-none stroke-2">
-                                     <polyline points={project.activityTrend.map((val, idx) => `${idx * 10},${30 - val * 3}`).join(' ')} />
+                             <td className="py-5 px-4">
+                                 <svg width="100" height="24" className="mx-auto overflow-visible">
+                                     <polyline 
+                                        fill="none" 
+                                        stroke="#3b82f6" 
+                                        strokeWidth="2" 
+                                        strokeLinecap="round" 
+                                        strokeLinejoin="round" 
+                                        points={project.activityTrend.map((val, idx) => `${idx * 10},${24 - val * 2}`).join(' ')} 
+                                     />
                                  </svg>
                              </td>
-                             <td className="py-4 px-4">
-                                 <span className="inline-block px-2 py-0.5 rounded border border-blue-200 text-blue-600 text-xs bg-blue-50">
+                             <td className="py-5 px-4">
+                                 <span className="px-2 py-0.5 rounded-md border border-blue-100 text-blue-600 font-bold bg-blue-50/50 uppercase">
                                      {project.statusLabel}
                                  </span>
                              </td>
-                             <td className="py-4 px-4 text-sm text-slate-600">{project.type}</td>
-                             <td className="py-4 px-4 text-sm text-slate-600 flex items-center gap-1">
-                                 <Users size={14} className="text-slate-400" />
-                                 {project.memberCount}
-                             </td>
-                             <td className="py-4 px-4">
+                             <td className="py-5 px-4">
                                  <div className="flex items-center gap-2">
-                                     <div className={`w-6 h-6 rounded-full ${project.manager.avatarColor} text-white flex items-center justify-center text-xs font-bold`}>
+                                     <div className={`w-6 h-6 rounded-lg ${project.manager.avatarColor} text-white flex items-center justify-center text-[10px] font-bold shadow-sm`}>
                                          {project.manager.name.substring(0, 2)}
                                      </div>
-                                     <span className="text-sm text-slate-700">{project.manager.name}</span>
+                                     <span className="font-bold text-slate-600">{project.manager.name}</span>
                                  </div>
                              </td>
-                             <td className="py-4 px-4 text-sm text-slate-600 flex items-center gap-1">
-                                 <Code2 size={14} className="text-slate-400" />
-                                 {project.repoCount}
+                             <td className="py-5 px-4 text-center">
+                                 <span className="font-bold text-slate-400 flex items-center justify-center gap-1">
+                                    <Users size={14} /> {project.memberCount}
+                                 </span>
                              </td>
-                             <td className="py-4 px-4 text-right">
-                                 <button className="p-1 text-slate-400 hover:text-slate-600 rounded">
+                             <td className="py-5 px-6 text-right">
+                                 <button className="p-2 text-slate-300 hover:text-slate-600 hover:bg-white rounded-lg transition-all opacity-0 group-hover:opacity-100">
                                      <MoreHorizontal size={18} />
                                  </button>
                              </td>

@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import {
-  LayoutDashboard, Map, FileText, CheckSquare, Bug, Repeat, FlaskConical, GitBranch, Flag, ShieldAlert, GitPullRequest, PlayCircle, BarChart2, Users, Settings,
-  Search, Bell, HelpCircle, Plus, ChevronDown, Box
+  LayoutDashboard, FileText, CheckSquare, Bug, Repeat, FlaskConical, GitBranch, Flag, ShieldAlert, GitPullRequest, PlayCircle, BarChart2, Users, Settings,
+  Search, Bell, HelpCircle, Plus, ChevronDown, Box, LayoutList
 } from './Icons';
 import { Project, TaskType, Task } from '../types';
 import { MOCK_COLUMNS } from '../constants';
@@ -13,7 +13,6 @@ import { ProjectOverview } from './ProjectOverview';
 import { WorkItemList } from './ProjectWorkItem';
 import { ProjectIterations } from './ProjectIteration';
 import { ProjectTesting } from './ProjectTesting';
-import { ProjectPlanning } from './ProjectPlanning';
 import { ProjectCodeReview } from './ProjectCodeReview';
 import { ProjectPipeline } from './ProjectPipeline';
 import { ProjectMilestones } from './ProjectMilestones';
@@ -22,6 +21,9 @@ import { ProjectMetrics } from './ProjectMetrics';
 import { ProjectMembers } from './ProjectMembers';
 import { ProjectSettings } from './ProjectSettings';
 import { ProjectVersions } from './ProjectVersions';
+import { DefectList } from './project/DefectList';
+import { RequirementList } from './project/RequirementList';
+import { ProjectGantt } from './project/ProjectGantt';
 
 interface ProjectDetailProps {
   project: Project;
@@ -61,12 +63,12 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
   // Consolidated Menu Logic
   const menuItems = [
     { icon: LayoutDashboard, label: '项目概览' },
-    { icon: FileText, label: '需求', count: tasks.filter(t => t.projectId === project.id && t.type === TaskType.Requirement).length },
+    { icon: FileText, label: '需求', count: 21 },
     { icon: CheckSquare, label: '任务', count: tasks.filter(t => t.projectId === project.id && t.type === TaskType.Task).length },
     { icon: Bug, label: '缺陷', count: tasks.filter(t => t.projectId === project.id && t.type === TaskType.Defect).length },
+    { icon: LayoutList, label: '甘特图' },
     { icon: Repeat, label: '迭代' },
     { icon: FlaskConical, label: '测试' },
-    { icon: Map, label: '规划' },
     { icon: GitBranch, label: '版本' },
     { icon: Flag, label: '里程碑', count: 5 },
     { icon: ShieldAlert, label: '风险', count: 4 },
@@ -78,7 +80,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
   ];
 
   // Logic to split menu items into visible and hidden (More)
-  const visibleCount = 7; // Reduced to ensure "More" always has space
+  const visibleCount = 8; 
   const visibleItems = menuItems.slice(0, visibleCount);
   const hiddenItems = menuItems.slice(visibleCount);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -86,16 +88,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
   const renderContent = () => {
     switch (activeTab) {
         case '项目概览': return <ProjectOverview project={project} />;
-        case '需求': return (
-            <WorkItemList 
-                project={project} 
-                type={TaskType.Requirement} 
-                tasks={tasks}
-                onCreate={() => openCreateModal(TaskType.Requirement)}
-                onTaskClick={setEditingTask}
-                onDelete={handleDeleteTask}
-            />
-        );
+        case '需求': return <RequirementList />;
         case '任务': return (
             <WorkItemList 
                 project={project} 
@@ -106,17 +99,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                 onDelete={handleDeleteTask}
             />
         );
-        case '缺陷': return (
-             <WorkItemList 
-                project={project} 
-                type={TaskType.Defect} 
-                tasks={tasks}
-                onCreate={() => openCreateModal(TaskType.Defect)}
-                onTaskClick={setEditingTask}
-                onDelete={handleDeleteTask}
-            />
-        );
-        case '规划': return <ProjectPlanning />;
+        case '缺陷': return <DefectList />;
+        case '甘特图': return <ProjectGantt />;
         case '迭代': return <ProjectIterations />;
         case '测试': return <ProjectTesting />;
         case '版本': return <ProjectVersions />;
@@ -170,7 +154,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                              <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 shadow-xl rounded-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
                                  <button
                                     onClick={() => {
-                                        openCreateModal(TaskType.Requirement);
+                                        setActiveTab('需求');
                                         setIsProjectPlusMenuOpen(false);
                                     }}
                                     className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
@@ -180,7 +164,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                                  </button>
                                  <button
                                     onClick={() => {
-                                        openCreateModal(TaskType.Defect);
+                                        setActiveTab('缺陷');
                                         setIsProjectPlusMenuOpen(false);
                                     }}
                                     className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
@@ -223,7 +207,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                         onClick={() => setActiveTab(item.label)}
                         className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors flex items-center gap-2 ${
                             activeTab === item.label 
-                            ? 'bg-blue-50 text-blue-500' 
+                            ? 'bg-blue-50 text-blue-600' 
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                         }`}
                      >
@@ -241,7 +225,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                              onClick={() => setIsMoreOpen(!isMoreOpen)}
                              className={`flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded transition-colors ${
                                  hiddenItems.some(i => i.label === activeTab) || isMoreOpen
-                                 ? 'text-blue-500 bg-blue-50'
+                                 ? 'text-blue-600 bg-blue-50'
                                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                              }`}
                          >
@@ -262,7 +246,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                                                 setIsMoreOpen(false);
                                             }}
                                             className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-slate-50 transition-colors ${
-                                                activeTab === item.label ? 'text-blue-500 bg-blue-50/50 font-semibold' : 'text-slate-700'
+                                                activeTab === item.label ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-slate-700'
                                             }`}
                                          >
                                              <div className="flex items-center gap-3">
@@ -303,7 +287,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
              <button className="text-slate-500 hover:text-slate-700">
                 <Settings size={20} />
              </button>
-             <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold cursor-pointer">
+             <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold shadow-sm shadow-orange-500/20 cursor-pointer">
                  Lo
              </div>
          </div>
