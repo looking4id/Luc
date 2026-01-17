@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MainSidebar, SecondarySidebar } from './components/Sidebar';
 import { TopHeader } from './components/TopHeader';
@@ -7,6 +8,11 @@ import { ProjectList } from './components/ProjectList';
 import { ProjectDetail } from './components/ProjectDetail';
 import { Workbench } from './components/Workbench';
 import { Login } from './components/Login';
+import { CodeManagement } from './components/CodeManagement';
+import { KnowledgeBase } from './components/KnowledgeBase';
+import { MemberManagement } from './components/MemberManagement';
+import { PerformanceMetrics } from './components/PerformanceMetrics';
+import { SystemSettings } from './components/SystemSettings';
 import { FilterState, ViewType, SavedView, TaskType, User, Project } from './types';
 
 const App = () => {
@@ -80,13 +86,8 @@ const App = () => {
       setIsCreateModalOpen(true);
   };
 
-  // Handler when user clicks on main sidebar items
   const handleMainItemSelect = (item: string) => {
       setActiveMainItem(item);
-      // Reset active project if navigating away from Project tab, 
-      // or if clicking "Project" again we could reset to list or keep detail. 
-      // For now, if clicking "项目", we show list if we were in detail? 
-      // Let's just switch main item. If main item is NOT "项目", activeProject doesn't matter much unless we want to persist state.
       if (item !== '项目') {
           setActiveProject(null);
       }
@@ -108,6 +109,16 @@ const App = () => {
             return <ProjectDetail project={activeProject} onBack={() => setActiveProject(null)} />;
         }
         return <ProjectList onProjectClick={setActiveProject} />;
+      case '代码':
+        return <CodeManagement />;
+      case '知识库':
+        return <KnowledgeBase />;
+      case '成员':
+        return <MemberManagement />;
+      case '效能度量':
+        return <PerformanceMetrics />;
+      case '设置':
+        return <SystemSettings />;
       case '工作项':
       default:
         return (

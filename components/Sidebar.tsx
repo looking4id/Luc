@@ -44,13 +44,15 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
         isExpanded ? 'w-60 items-start' : 'w-16 items-center'
       } bg-[#0f172a] border-r border-[#1e293b] flex flex-col py-5 z-20 flex-shrink-0 shadow-xl transition-all duration-300 relative`}
     >
-      {/* Toggle Button */}
+      {/* Semi-circular Toggle Button */}
       <button 
         onClick={() => setIsExpanded(!isExpanded)}
-        className="absolute -right-3 top-12 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 hover:text-blue-600 shadow-sm z-50 cursor-pointer hover:shadow-md transition-all"
+        className="absolute -right-[17px] top-12 w-4 h-12 bg-white border border-l-0 border-slate-200 rounded-r-full flex items-center justify-center text-slate-500 hover:text-blue-600 shadow-sm z-50 cursor-pointer hover:shadow-md transition-all group"
         title={isExpanded ? "收起菜单" : "展开菜单"}
       >
-        {isExpanded ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        <div className="transform transition-transform duration-300 group-hover:scale-110">
+          {isExpanded ? <ChevronLeft size={14} strokeWidth={3} /> : <ChevronRight size={14} strokeWidth={3} />}
+        </div>
       </button>
 
       {/* Logo */}

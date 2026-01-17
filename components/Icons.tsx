@@ -64,7 +64,10 @@ import {
   TrendingUp,
   TrendingDown,
   User,
-  ListChecks
+  ListChecks,
+  Mail,
+  UserCheck,
+  CreditCard
 } from 'lucide-react';
 
 export {
@@ -132,7 +135,10 @@ export {
   TrendingUp,
   TrendingDown,
   User,
-  ListChecks
+  ListChecks,
+  Mail,
+  UserCheck,
+  CreditCard
 };
 
 export const GLogo = () => (

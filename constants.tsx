@@ -3,13 +3,16 @@ import { Column, Priority, TaskType, User, Project } from './types';
 
 const user1: User = { id: 'u1', name: 'lo', avatarColor: 'bg-yellow-500' };
 const user2: User = { id: 'u2', name: 'Dev 1', avatarColor: 'bg-blue-500' };
+const user3: User = { id: 'u3', name: '产品经理', avatarColor: 'bg-purple-500' };
+const user4: User = { id: 'u4', name: '测试工程师', avatarColor: 'bg-green-500' };
+const user5: User = { id: 'u5', name: 'UI设计师', avatarColor: 'bg-pink-500' };
 
 export const MOCK_USERS: User[] = [
   user1, 
   user2,
-  { id: 'u3', name: '产品经理', avatarColor: 'bg-purple-500' },
-  { id: 'u4', name: '测试工程师', avatarColor: 'bg-green-500' },
-  { id: 'u5', name: 'UI设计师', avatarColor: 'bg-pink-500' }
+  user3,
+  user4,
+  user5
 ];
 
 export const MOCK_PROJECTS: Project[] = [
@@ -20,7 +23,7 @@ export const MOCK_PROJECTS: Project[] = [
     type: '敏捷项目',
     manager: user1,
     statusLabel: '开始',
-    memberCount: 1,
+    memberCount: 5,
     repoCount: 1,
     activityTrend: [2, 4, 3, 5, 4, 6, 7, 5, 8, 9],
     isStar: true,
@@ -33,7 +36,7 @@ export const MOCK_PROJECTS: Project[] = [
     type: '标准项目',
     manager: user1,
     statusLabel: '开始',
-    memberCount: 1,
+    memberCount: 3,
     repoCount: 0,
     activityTrend: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     isStar: true,
@@ -45,116 +48,101 @@ export const MOCK_COLUMNS: Column[] = [
   {
     id: 'todo',
     title: '待办的',
-    count: 2,
+    count: 5,
     iconColor: 'text-gray-400',
     tasks: [
       {
         id: 't1',
-        displayId: '#ICQMC6',
-        title: '【示例任务】后端任务：菜品点赞接口',
-        type: TaskType.Task,
-        priority: Priority.High,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
+        displayId: '#RQ-101',
+        title: '【需求】支持移动端扫码支付功能',
+        type: TaskType.Requirement,
+        priority: Priority.Urgent,
+        tags: ['支付模块', '核心'],
+        dueDate: '2025-08-20',
         assignee: user1,
-        statusColor: 'bg-blue-600',
-        description: '设计并实现菜品点赞的后端API接口，包括数据库设计、接口定义以及单元测试。需要处理高并发场景下的点赞计数问题。',
+        statusColor: 'bg-gray-400',
+        description: '在结算页面增加聚合支付入口，支持微信与支付宝扫码。',
         progress: 0,
         projectId: 'p1',
-        creatorId: 'u1'
+        creatorId: 'u3'
       },
       {
         id: 't2',
-        displayId: '#ICQMC5',
-        title: '【示例任务】前端任务：点赞功能开发',
-        type: TaskType.Task,
+        displayId: '#DF-201',
+        title: '【缺陷】结算页面在iOS 15系统下样式错乱',
+        type: TaskType.Defect,
         priority: Priority.High,
-        tags: ['新手引导'],
+        tags: ['兼容性'],
         dueDate: '2025-08-16',
-        assignee: user1,
-        statusColor: 'bg-blue-600',
-        description: '在菜品详情页添加点赞按钮，实现与后端的交互逻辑，增加点赞动画效果，优化用户体验。',
-        progress: 10,
+        assignee: user2,
+        statusColor: 'bg-red-500',
+        description: '结算按钮在低版本系统下高度塌陷。',
+        progress: 0,
         projectId: 'p1',
-        creatorId: 'u1'
+        creatorId: 'u4'
+      },
+      {
+        id: 't101',
+        displayId: '#RQ-105',
+        title: '【需求】增加多语言支持 (中/英)',
+        type: TaskType.Requirement,
+        priority: Priority.Normal,
+        tags: ['国际化'],
+        dueDate: '2025-09-01',
+        assignee: user3,
+        statusColor: 'bg-gray-400',
+        projectId: 'p1',
+        creatorId: 'u3'
       }
     ]
   },
   {
     id: 'inprogress',
     title: '进行中',
-    count: 10,
+    count: 4,
     iconColor: 'text-blue-500',
     tasks: [
       {
         id: 't3',
-        displayId: '#ICQMCC',
-        title: '【示例需求】后台支持发票审查通过功能',
+        displayId: '#RQ-102',
+        title: '【需求】个人中心增加余额提取功能',
         type: TaskType.Requirement,
         priority: Priority.Urgent,
-        tags: ['新手引导'],
+        tags: ['钱包'],
         dueDate: '2025-08-30',
         assignee: user1,
         statusColor: 'bg-blue-600',
-        description: '运营后台需要新增发票审查模块，支持财务人员批量审核发票请求，并发送通知给用户。',
+        description: '支持用户将余额提取至绑定的银行卡。',
         progress: 45,
-        projectId: 'p2',
-        creatorId: 'u2'
+        projectId: 'p1',
+        creatorId: 'u3'
       },
       {
         id: 't4',
-        displayId: '#ICQMC2',
-        title: '【示例任务】后端任务：删除菜品接口',
-        type: TaskType.Task,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
-        assignee: user1,
+        displayId: '#DF-202',
+        title: '【缺陷】图片上传超过5MB时无错误提示',
+        type: TaskType.Defect,
+        priority: Priority.Normal,
+        tags: ['UI反馈'],
+        dueDate: '2025-08-18',
+        assignee: user2,
         statusColor: 'bg-blue-600',
-        description: '提供软删除菜品的接口，确保历史订单数据不受影响。',
+        description: '直接卡死或转圈，需要明确告知用户。',
         progress: 60,
         projectId: 'p1',
         creatorId: 'u1'
       },
       {
         id: 't5',
-        displayId: '#ICQMC3',
-        title: '【示例任务】前端任务：跳转逻辑修改',
+        displayId: '#TS-301',
+        title: '【任务】后端API接口文档维护',
         type: TaskType.Task,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
+        priority: Priority.Normal,
+        tags: ['文档'],
+        dueDate: '2025-08-22',
         assignee: user1,
         statusColor: 'bg-blue-600',
         progress: 80,
-        projectId: 'p1',
-        creatorId: 'u1'
-      },
-       {
-        id: 't6',
-        displayId: '#ICQMC4',
-        title: '【示例任务】后端任务：提交订单接口',
-        type: TaskType.Task,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
-        assignee: user1,
-        statusColor: 'bg-blue-600',
-        progress: 25,
-        projectId: 'p2',
-        creatorId: 'u1'
-      },
-      {
-        id: 't7',
-        displayId: '#ICQMC1',
-        title: '【示例任务】后端任务：编辑菜品接口',
-        type: TaskType.Task,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
-        assignee: user1,
-        statusColor: 'bg-blue-600',
-        progress: 90,
         projectId: 'p1',
         creatorId: 'u1'
       }
@@ -163,145 +151,92 @@ export const MOCK_COLUMNS: Column[] = [
   {
     id: 'done',
     title: '已完成',
-    count: 4,
+    count: 3,
     iconColor: 'text-green-500',
     tasks: [
       {
         id: 't8',
-        displayId: '#ICQMC0',
-        title: '【示例任务】后端任务：多人点餐接口',
-        type: TaskType.Task,
+        displayId: '#RQ-100',
+        title: '【需求】基础登录注册流程开发',
+        type: TaskType.Requirement,
         priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
+        tags: ['账号系统'],
+        dueDate: '2025-08-10',
         assignee: user1,
         statusColor: 'bg-green-500',
         progress: 100,
         projectId: 'p1',
-        creatorId: 'u1'
+        creatorId: 'u3'
       },
       {
         id: 't9',
-        displayId: '#ICQMBZ',
-        title: '【示例任务】前端任务：点餐人数显示',
-        type: TaskType.Task,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
-        assignee: user1,
+        displayId: '#DF-200',
+        title: '【缺陷】首页Banner在某些分辨率下显示模糊',
+        type: TaskType.Defect,
+        priority: Priority.Normal,
+        tags: ['视觉体验'],
+        dueDate: '2025-08-12',
+        assignee: user5,
         statusColor: 'bg-green-500',
         progress: 100,
         projectId: 'p1',
-        creatorId: 'u1'
-      },
-      {
-        id: 't10',
-        displayId: '#ICQMBX',
-        title: '【示例任务】多人点餐测试用例编写',
-        type: TaskType.Task,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
-        assignee: user1,
-        statusColor: 'bg-green-500',
-        progress: 100,
-        projectId: 'p1',
-        creatorId: 'u2'
-      },
-      {
-        id: 't11',
-        displayId: '#ICQMBQ',
-        title: '【示例需求】支持多人扫码加入点餐',
-        type: TaskType.Requirement,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-16',
-        assignee: user1,
-        statusColor: 'bg-green-500',
-        progress: 100,
-        projectId: 'p2',
-        creatorId: 'u1'
+        creatorId: 'u4'
       }
     ]
   },
   {
     id: 'intention',
     title: '意向',
-    count: 5,
+    count: 2,
     iconColor: 'text-gray-400',
     tasks: [
       {
         id: 't12',
-        displayId: '#ICQMCA',
-        title: '【示例需求】开票完成后支持更改发票信息',
+        displayId: '#RQ-108',
+        title: '【需求】增加数据导出Excel功能',
         type: TaskType.Requirement,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-30',
+        priority: Priority.Normal,
+        tags: ['数据'],
+        dueDate: '2025-12-30',
         assignee: user1,
         statusColor: 'bg-gray-300',
-        projectId: 'p3',
+        projectId: 'p1',
         creatorId: 'u1'
       },
       {
-        id: 't13',
-        displayId: '#ICQMCB',
-        title: '【示例需求】开票完成后支持发送至邮箱',
-        type: TaskType.Requirement,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-30',
-        assignee: user1,
-        statusColor: 'bg-gray-300',
-        projectId: 'p3',
-        creatorId: 'u1'
-      },
-      {
-        id: 't14',
-        displayId: '#ICQMC8',
-        title: '【示例需求】付款后支持自助申请开票',
-        type: TaskType.Requirement,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-30',
-        assignee: user1,
-        statusColor: 'bg-gray-300',
-        projectId: 'p3',
-        creatorId: 'u1'
-      },
-      {
-        id: 't15',
-        displayId: '#ICQMC7',
-        title: '【示例需求】支持用户在小程序自助开票',
-        type: TaskType.Requirement,
-        priority: Priority.Urgent,
-        tags: ['新手引导'],
-        dueDate: '2025-08-30',
-        assignee: user1,
-        statusColor: 'bg-gray-300',
-        projectId: 'p3',
-        creatorId: 'u1'
-      },
-       {
         id: 't16',
-        displayId: '#ICQMC9',
-        title: '【示例需求】订单页面支持查看开票进度',
+        displayId: '#RQ-109',
+        title: '【需求】支持暗黑模式自动切换',
         type: TaskType.Requirement,
-        priority: Priority.High,
-        tags: ['新手引导'],
-        dueDate: '',
-        assignee: null as any,
+        priority: Priority.Normal,
+        tags: ['体验优化'],
+        dueDate: '2026-01-15',
+        assignee: user5,
         statusColor: 'bg-gray-300',
-        projectId: 'p2',
-        creatorId: 'u2'
+        projectId: 'p1',
+        creatorId: 'u5'
       }
     ]
   },
   {
     id: 'cancelled',
     title: '已取消',
-    count: 0,
+    count: 1,
     iconColor: 'text-red-400',
-    tasks: []
+    tasks: [
+      {
+        id: 't200',
+        displayId: '#DF-500',
+        title: '【缺陷】IE 11兼容性问题 (已放弃支持)',
+        type: TaskType.Defect,
+        priority: Priority.Normal,
+        tags: ['兼容性'],
+        dueDate: '2025-07-01',
+        assignee: user2,
+        statusColor: 'bg-red-200',
+        projectId: 'p1',
+        creatorId: 'u4'
+      }
+    ]
   }
 ];
