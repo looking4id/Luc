@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   LayoutGrid,
@@ -70,7 +71,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
                   <input 
                       type="text" 
                       placeholder="搜索..." 
-                      className="bg-transparent border-none outline-none text-xs ml-2 text-slate-200 w-full placeholder:text-slate-500"
+                      className="bg-transparent border-none outline-none text-sm ml-2 text-slate-200 w-full placeholder:text-slate-500"
                   />
               </div>
           </div>
@@ -100,7 +101,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
                       {item.label}
                   </span>
               ) : (
-                  <span className={`text-[10px] font-medium scale-90 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-400'}`}>
+                  <span className={`text-[12px] font-medium scale-90 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-400'}`}>
                       {item.label}
                   </span>
               )}
@@ -111,7 +112,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
         {/* Recent Spaces (Expanded Only) */}
         {isExpanded && (
             <div className="mt-6 px-3 animate-in fade-in slide-in-from-bottom-2 duration-300 delay-100 border-t border-slate-800/50 pt-4">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-bold uppercase tracking-wider mb-2">
+                <div className="flex items-center justify-between text-[12px] text-slate-500 font-bold uppercase tracking-wider mb-2">
                     <span>最近访问空间</span>
                     <Plus size={12} className="cursor-pointer hover:text-slate-300" />
                 </div>
@@ -139,7 +140,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
                  <span className="text-sm">公司管理</span>
              </div>
          ) : (
-            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 text-xs hover:bg-slate-700 cursor-pointer transition-colors" title="设置">
+            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 text-sm hover:bg-slate-700 cursor-pointer transition-colors" title="设置">
                 <Settings size={18} />
             </div>
          )}
@@ -177,9 +178,9 @@ export const SecondarySidebar: React.FC<SecondarySidebarProps> = ({
     <div className="w-60 bg-[#f8fafc] border-r border-slate-200 flex flex-col flex-shrink-0 h-full">
       {/* Header */}
       <div className="h-14 flex items-center justify-between px-4 border-b border-slate-100 flex-shrink-0 bg-white/50 backdrop-blur-sm">
-        <div className="flex items-center gap-2 font-semibold text-slate-700">
+        <div className="flex items-center gap-2 font-semibold text-slate-700 text-sm">
           <span>视图</span>
-          <span className="text-blue-500 text-xs bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">Pin</span>
+          <span className="text-blue-500 text-[12px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">Pin</span>
         </div>
       </div>
 
@@ -191,7 +192,7 @@ export const SecondarySidebar: React.FC<SecondarySidebarProps> = ({
               className="px-4 py-1.5 flex items-center justify-between text-slate-500 hover:text-slate-800 cursor-pointer text-sm select-none transition-colors"
               onClick={() => setIsSystemOpen(!isSystemOpen)}
             >
-                <span className="font-bold text-xs uppercase tracking-wider text-slate-400">系统视图</span>
+                <span className="font-bold text-[12px] uppercase tracking-wider text-slate-400">系统视图</span>
                 <ChevronDown size={14} className={`transition-transform duration-200 ${isSystemOpen ? '' : '-rotate-90'}`} />
             </div>
             {isSystemOpen && (
@@ -219,7 +220,7 @@ export const SecondarySidebar: React.FC<SecondarySidebarProps> = ({
               className="px-4 py-1.5 flex items-center justify-between text-slate-500 hover:text-slate-800 cursor-pointer text-sm group select-none transition-colors"
               onClick={() => setIsPersonalOpen(!isPersonalOpen)}
             >
-                <span className="font-bold text-xs uppercase tracking-wider text-slate-400">个人视图</span>
+                <span className="font-bold text-[12px] uppercase tracking-wider text-slate-400">个人视图</span>
                 <div className="flex items-center gap-2">
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <ListFilter size={14} />
@@ -253,7 +254,7 @@ export const SecondarySidebar: React.FC<SecondarySidebarProps> = ({
                     </div>
                   ))}
                   {customViews.length === 0 && (
-                     <div className="px-6 py-1 text-xs text-slate-400 italic">暂无个人视图</div>
+                     <div className="px-6 py-1 text-[12px] text-slate-400 italic">暂无个人视图</div>
                   )}
               </div>
             )}
@@ -264,7 +265,7 @@ export const SecondarySidebar: React.FC<SecondarySidebarProps> = ({
               className="px-4 py-1.5 flex items-center justify-between text-slate-500 hover:text-slate-800 cursor-pointer text-sm group select-none transition-colors"
               onClick={() => setIsPublicOpen(!isPublicOpen)}
             >
-                <span className="font-bold text-xs uppercase tracking-wider text-slate-400">公共视图</span>
+                <span className="font-bold text-[12px] uppercase tracking-wider text-slate-400">公共视图</span>
                 <div className="flex items-center gap-2">
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <ListFilter size={14} />

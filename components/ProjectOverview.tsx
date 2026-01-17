@@ -27,7 +27,7 @@ export const ProjectOverview: React.FC<{ project: Project }> = ({ project }) => 
                     <span className="text-slate-500">项目负责人:</span>
                     <div className="flex items-center gap-2">
                         <div className="w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] flex items-center justify-center">L</div>
-                        <span className="font-medium text-slate-700">looking4id</span>
+                        <span className="font-medium text-slate-700">lo</span>
                     </div>
                 </div>
                 <div className="flex justify-between items-center border-b border-slate-50 pb-2">
@@ -68,7 +68,7 @@ export const ProjectOverview: React.FC<{ project: Project }> = ({ project }) => 
 
                 {/* Bars */}
                 {[
-                    { user: 'looking4id', task: 12, defect: 4 },
+                    { user: 'lo', task: 12, defect: 4 },
                     { user: 'dev01', task: 8, defect: 2 },
                     { user: 'qa01', task: 5, defect: 8 },
                     { user: 'pm01', task: 15, defect: 0 }

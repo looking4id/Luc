@@ -15,9 +15,9 @@ export const ProjectPipeline = () => (
         <div className="flex-1 overflow-auto p-6">
             <div className="space-y-4">
                 {[
-                    { id: '#1024', name: 'Backend-CI-Master', status: 'Success', branch: 'master', trigger: 'Push by looking4id', time: '5分钟前', duration: '2m 30s' },
+                    { id: '#1024', name: 'Backend-CI-Master', status: 'Success', branch: 'master', trigger: 'Push by lo', time: '5分钟前', duration: '2m 30s' },
                     { id: '#1023', name: 'Frontend-CI-Dev', status: 'Running', branch: 'dev', trigger: 'Merge by dev01', time: '15分钟前', duration: 'Running' },
-                    { id: '#1022', name: 'Backend-CI-Master', status: 'Failed', branch: 'master', trigger: 'Push by looking4id', time: '1小时前', duration: '1m 10s' },
+                    { id: '#1022', name: 'Backend-CI-Master', status: 'Failed', branch: 'master', trigger: 'Push by lo', time: '1小时前', duration: '1m 10s' },
                 ].map((p, i) => (
                     <div key={i} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:shadow-sm">
                         <div className="flex items-center gap-4">

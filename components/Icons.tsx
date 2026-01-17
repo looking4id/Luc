@@ -60,7 +60,11 @@ import {
   List,
   Link,
   Lock,
-  Printer
+  Printer,
+  TrendingUp,
+  TrendingDown,
+  User,
+  ListChecks
 } from 'lucide-react';
 
 export {
@@ -124,7 +128,11 @@ export {
   List,
   Link,
   Lock,
-  Printer
+  Printer,
+  TrendingUp,
+  TrendingDown,
+  User,
+  ListChecks
 };
 
 export const GLogo = () => (

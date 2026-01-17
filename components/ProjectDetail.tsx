@@ -45,8 +45,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
 
   const handleUpdateTask = (updatedTask: Task) => {
     setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
-    // If editing, update the modal content ref via state if needed, but TaskDetailsModal handles its own internal state mostly,
-    // we just need to update the list.
     setEditingTask(updatedTask);
   };
 
@@ -80,7 +78,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
   ];
 
   // Logic to split menu items into visible and hidden (More)
-  const visibleCount = 8;
+  const visibleCount = 7; // Reduced to ensure "More" always has space
   const visibleItems = menuItems.slice(0, visibleCount);
   const hiddenItems = menuItems.slice(visibleCount);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -140,10 +138,10 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-slate-50 overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-slate-50 overflow-hidden font-sans">
       {/* Top Navigation Bar (Horizontal) */}
-      <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 shadow-sm flex-shrink-0 z-20">
-         <div className="flex items-center gap-6 overflow-hidden">
+      <div className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-4 shadow-sm flex-shrink-0 z-30">
+         <div className="flex items-center gap-6">
              {/* Project Title / Back */}
              <div className="flex items-center gap-3 flex-shrink-0 pr-4 border-r border-slate-200">
                  <button 
@@ -151,11 +149,11 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                     className="p-1.5 hover:bg-slate-100 rounded text-slate-500 transition-colors"
                     title="返回项目列表"
                  >
-                    <div className="w-6 h-6 rounded bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
+                    <div className="w-6 h-6 rounded bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
                         {project.name.substring(0,1)}
                     </div>
                  </button>
-                 <span className="font-bold text-slate-800 text-lg truncate max-w-[120px]">{project.name}</span>
+                 <span className="font-bold text-slate-800 text-sm truncate max-w-[120px]">{project.name}</span>
                  
                  {/* Project Action Menu */}
                  <div className="relative">
@@ -217,13 +215,13 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                  </div>
              </div>
 
-             {/* Horizontal Menu */}
+             {/* Horizontal Menu Group */}
              <div className="flex items-center gap-1">
                  {visibleItems.map(item => (
                      <button
                         key={item.label}
                         onClick={() => setActiveTab(item.label)}
-                        className={`px-3 py-1.5 text-base font-medium rounded-md whitespace-nowrap transition-colors flex items-center gap-2 ${
+                        className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors flex items-center gap-2 ${
                             activeTab === item.label 
                             ? 'bg-blue-50 text-blue-600' 
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -231,7 +229,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                      >
                          <span>{item.label}</span>
                          {item.count !== undefined && item.count > 0 && (
-                             <span className="text-xs bg-slate-100 text-slate-500 px-1.5 rounded-full">{item.count}</span>
+                             <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 rounded-full">{item.count}</span>
                          )}
                      </button>
                  ))}
@@ -241,7 +239,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                      <div className="relative ml-2">
                          <button 
                              onClick={() => setIsMoreOpen(!isMoreOpen)}
-                             className={`flex items-center gap-1 text-base font-medium px-2 py-1.5 rounded transition-colors ${
+                             className={`flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded transition-colors ${
                                  hiddenItems.some(i => i.label === activeTab) || isMoreOpen
                                  ? 'text-blue-600 bg-blue-50'
                                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
@@ -255,7 +253,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                          {isMoreOpen && (
                              <>
                                  <div className="fixed inset-0 z-40" onClick={() => setIsMoreOpen(false)}></div>
-                                 <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+                                 <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-slate-200 shadow-xl rounded-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
                                      {hiddenItems.map(item => (
                                          <button
                                             key={item.label}
@@ -263,16 +261,16 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                                                 setActiveTab(item.label);
                                                 setIsMoreOpen(false);
                                             }}
-                                            className={`w-full text-left px-4 py-2 text-base flex items-center justify-between hover:bg-slate-50 ${
-                                                activeTab === item.label ? 'text-blue-600 bg-blue-50/50' : 'text-slate-600'
+                                            className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-slate-50 transition-colors ${
+                                                activeTab === item.label ? 'text-blue-600 bg-blue-50/50 font-semibold' : 'text-slate-700'
                                             }`}
                                          >
-                                             <div className="flex items-center gap-2">
-                                                 <item.icon size={16} />
+                                             <div className="flex items-center gap-3">
+                                                 <item.icon size={16} className={activeTab === item.label ? 'text-blue-600' : 'text-slate-400'} />
                                                  <span>{item.label}</span>
                                              </div>
                                              {item.count !== undefined && (
-                                                 <span className="text-xs text-slate-400">{item.count}</span>
+                                                 <span className="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">{item.count}</span>
                                              )}
                                          </button>
                                      ))}
@@ -285,7 +283,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
          </div>
 
          {/* Right Utilities */}
-         <div className="flex items-center gap-4 flex-shrink-0 pl-4 bg-white shadow-[-10px_0_10px_-5px_rgba(255,255,255,1)]">
+         <div className="flex items-center gap-4 flex-shrink-0 pl-4 bg-white">
              {/* Search */}
              <div className="relative hidden lg:block">
                  <input 

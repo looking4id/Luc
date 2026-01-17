@@ -27,9 +27,9 @@ export const ProjectCodeReview = () => (
                 </thead>
                 <tbody>
                     {[
-                        { id: 'MR-101', title: 'feat: add user login api', status: 'Open', author: 'looking4id', reviewer: 'dev01', time: '10分钟前' },
-                        { id: 'MR-100', title: 'fix: payment callback error', status: 'Merged', author: 'dev01', reviewer: 'looking4id', time: '2小时前' },
-                        { id: 'MR-99', title: 'docs: update readme', status: 'Merged', author: 'pm01', reviewer: 'looking4id', time: '1天前' },
+                        { id: 'MR-101', title: 'feat: add user login api', status: 'Open', author: 'lo', reviewer: 'dev01', time: '10分钟前' },
+                        { id: 'MR-100', title: 'fix: payment callback error', status: 'Merged', author: 'dev01', reviewer: 'lo', time: '2小时前' },
+                        { id: 'MR-99', title: 'docs: update readme', status: 'Merged', author: 'pm01', reviewer: 'lo', time: '1天前' },
                     ].map(mr => (
                         <tr key={mr.id} className="border-b border-slate-100 hover:bg-slate-50 group">
                             <td className="py-3 px-4 text-xs font-mono text-slate-500">{mr.id}</td>

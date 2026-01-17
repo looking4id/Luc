@@ -1,7 +1,7 @@
 
 import { Column, Priority, TaskType, User, Project } from './types';
 
-const user1: User = { id: 'u1', name: 'looking4id', avatarColor: 'bg-yellow-500' };
+const user1: User = { id: 'u1', name: 'lo', avatarColor: 'bg-yellow-500' };
 const user2: User = { id: 'u2', name: 'Dev 1', avatarColor: 'bg-blue-500' };
 
 export const MOCK_USERS: User[] = [

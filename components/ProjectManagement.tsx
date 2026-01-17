@@ -14,7 +14,7 @@ const MOCK_MILESTONES = [
 ];
 
 const MOCK_RISKS = [
-    { id: 'R-001', title: '第三方支付接口政策变动', probability: '高', impact: '高', status: '处理中', owner: 'looking4id', strategy: '规避', created: '2025-07-05' },
+    { id: 'R-001', title: '第三方支付接口政策变动', probability: '高', impact: '高', status: '处理中', owner: 'lo', strategy: '规避', created: '2025-07-05' },
     { id: 'R-002', title: '服务器并发预估不足', probability: '中', impact: '高', status: '已识别', owner: 'dev01', strategy: '减轻', created: '2025-07-08' },
     { id: 'R-003', title: 'UI设计师临时请假', probability: '低', impact: '中', status: '已关闭', owner: 'pm01', strategy: '接受', created: '2025-07-10' },
     { id: 'R-004', title: '竞品提前上线', probability: '中', impact: '中', status: '已识别', owner: 'pm01', strategy: '转移', created: '2025-07-12' },
@@ -274,7 +274,7 @@ export const ProjectVersions = () => (
                              <div className="text-sm text-slate-500">{ver.desc}</div>
                              <div className="text-xs text-slate-400 mt-2 flex items-center gap-4">
                                  <span>发布于: {ver.date}</span>
-                                 <span>负责人: looking4id</span>
+                                 <span>负责人: lo</span>
                              </div>
                          </div>
                      </div>

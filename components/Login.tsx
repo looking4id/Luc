@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AuthService } from '../services/api';
 import { ChevronDown, RefreshCw } from './Icons';
@@ -11,9 +12,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Phone Login State
-  const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
+  // Phone Login State - Pre-filled with default values
+  const [phone, setPhone] = useState('13800000000');
+  const [code, setCode] = useState('123456');
   const [countdown, setCountdown] = useState(0);
 
   // Password Login State
@@ -62,15 +63,17 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 // Mock success for any phone input
                 onLoginSuccess({
                     id: 'u1',
-                    name: 'looking4id',
+                    name: 'lo',
                     avatarColor: 'bg-yellow-500'
                 });
-            }, 800);
+            }, 500);
         }
     } catch (err) {
       setError('网络异常，请重试');
     } finally {
-      setLoading(false);
+      // In a real app we might not set loading false if redirecting, 
+      // but for this mock we need it.
+      if (loginMethod === 'password') setLoading(false);
     }
   };
 
@@ -80,23 +83,21 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       {/* Main Card */}
       <div className="bg-white rounded-[4px] shadow-2xl shadow-slate-200/50 w-[960px] h-[580px] flex overflow-hidden">
         
-        {/* Left Side: Illustration - Recreated based on TAPD Prototype */}
+        {/* Left Side: Illustration */}
         <div className="w-[45%] relative bg-gradient-to-br from-blue-50 to-white p-10 flex flex-col overflow-hidden border-r border-slate-100">
              {/* Decorative Blurs */}
              <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl"></div>
              <div className="absolute top-40 -left-10 w-32 h-32 bg-indigo-100/30 rounded-full blur-2xl"></div>
 
-             {/* Brand Text - Updated to LUK */}
+             {/* Brand Text */}
              <div className="z-10 mt-4 relative">
                  <h1 className="text-4xl font-black text-blue-600 italic tracking-wider mb-2" style={{ fontFamily: '"Arial", sans-serif' }}>LUK</h1>
                  <h2 className="text-3xl font-bold text-slate-800 mb-3 tracking-tight">让协作更敏捷</h2>
                  <p className="text-xs text-slate-500 tracking-[0.4em] uppercase font-medium">助力团队高效协作</p>
              </div>
              
-             {/* 3D Illustration approximation */}
              <div className="absolute top-1/4 left-0 right-0 bottom-0 flex items-end justify-center pointer-events-none">
                  <div className="relative w-full h-full flex items-end justify-center">
-                    {/* Lightened image using CSS filters */}
                      <img 
                          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
                          alt="Collaboration 3D" 
@@ -225,7 +226,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         </div>
       </div>
       
-      {/* Footer */}
       <div className="mt-8 text-xs text-slate-400 font-sans">
         © PingCode
       </div>

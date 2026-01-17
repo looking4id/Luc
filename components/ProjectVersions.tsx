@@ -28,7 +28,7 @@ export const ProjectVersions = () => (
                              <div className="text-sm text-slate-500">{ver.desc}</div>
                              <div className="text-xs text-slate-400 mt-2 flex items-center gap-4">
                                  <span>发布于: {ver.date}</span>
-                                 <span>负责人: looking4id</span>
+                                 <span>负责人: lo</span>
                              </div>
                          </div>
                      </div>

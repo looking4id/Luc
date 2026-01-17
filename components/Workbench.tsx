@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { 
   LayoutGrid, Plus, RefreshCw, Maximize2, MoreHorizontal, 
@@ -386,7 +387,7 @@ export const Workbench: React.FC<WorkbenchProps> = ({ onProjectSelect }) => {
 
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 p-6 custom-scrollbar">
-      <WorkbenchHeader user="looking4id" onAddClick={() => setIsAddModalOpen(true)} />
+      <WorkbenchHeader user="lo" onAddClick={() => setIsAddModalOpen(true)} />
       
       {/* Stats Row */}
       {visibleWidgets.stats && (
