@@ -4,9 +4,10 @@ import { TopHeader } from './components/TopHeader';
 import { FilterBar } from './components/FilterBar';
 import { KanbanBoard } from './components/KanbanBoard';
 import { ProjectList } from './components/ProjectList';
+import { ProjectDetail } from './components/ProjectDetail';
 import { Workbench } from './components/Workbench';
 import { Login } from './components/Login';
-import { FilterState, ViewType, SavedView, TaskType, User } from './types';
+import { FilterState, ViewType, SavedView, TaskType, User, Project } from './types';
 
 const App = () => {
   const initialFilters: FilterState = {
@@ -24,6 +25,8 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   
   const [activeMainItem, setActiveMainItem] = useState('工作台');
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [viewType, setViewType] = useState<ViewType>('kanban');
   const [activeView, setActiveView] = useState('全部工作项');
@@ -77,6 +80,18 @@ const App = () => {
       setIsCreateModalOpen(true);
   };
 
+  // Handler when user clicks on main sidebar items
+  const handleMainItemSelect = (item: string) => {
+      setActiveMainItem(item);
+      // Reset active project if navigating away from Project tab, 
+      // or if clicking "Project" again we could reset to list or keep detail. 
+      // For now, if clicking "项目", we show list if we were in detail? 
+      // Let's just switch main item. If main item is NOT "项目", activeProject doesn't matter much unless we want to persist state.
+      if (item !== '项目') {
+          setActiveProject(null);
+      }
+  };
+
   if (!isAuthenticated) {
     return <Login onLoginSuccess={handleLoginSuccess} />;
   }
@@ -84,9 +99,15 @@ const App = () => {
   const renderContent = () => {
     switch (activeMainItem) {
       case '工作台':
-        return <Workbench />;
+        return <Workbench onProjectSelect={(p) => {
+            setActiveProject(p);
+            setActiveMainItem('项目');
+        }} />;
       case '项目':
-        return <ProjectList />;
+        if (activeProject) {
+            return <ProjectDetail project={activeProject} onBack={() => setActiveProject(null)} />;
+        }
+        return <ProjectList onProjectClick={setActiveProject} />;
       case '工作项':
       default:
         return (
@@ -129,7 +150,7 @@ const App = () => {
     <div className="flex h-screen w-screen overflow-hidden bg-white">
       <MainSidebar 
         activeItem={activeMainItem}
-        onSelectItem={setActiveMainItem}
+        onSelectItem={handleMainItemSelect}
       />
       {renderContent()}
     </div>

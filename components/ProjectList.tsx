@@ -20,7 +20,11 @@ import {
 import { MOCK_PROJECTS } from '../constants';
 import { Project } from '../types';
 
-export const ProjectList: React.FC = () => {
+interface ProjectListProps {
+  onProjectClick?: (project: Project) => void;
+}
+
+export const ProjectList: React.FC<ProjectListProps> = ({ onProjectClick }) => {
   return (
     <div className="flex flex-col h-full bg-white flex-1 overflow-hidden">
       {/* Top Global Header (Specific to Project View based on screenshot) */}
@@ -28,10 +32,6 @@ export const ProjectList: React.FC = () => {
         <div className="flex items-center gap-4">
            <div className="flex items-center gap-2 text-slate-700 font-bold text-lg">
              <span>项目</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <a href="#" className="text-sm text-blue-600 hover:underline">升级到付费版</a>
-              <span className="text-xs bg-red-500 text-white px-1.5 py-0.5 rounded">双十一年度特惠</span>
            </div>
         </div>
 
@@ -164,7 +164,11 @@ export const ProjectList: React.FC = () => {
                  </thead>
                  <tbody>
                      {MOCK_PROJECTS.map((project) => (
-                         <tr key={project.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                         <tr 
+                             key={project.id} 
+                             className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
+                             onClick={() => onProjectClick && onProjectClick(project)}
+                         >
                              <td className="py-4 px-4 text-center">
                                  <div className={`w-1.5 h-10 -my-2 rounded-r ${project.id === 'p1' ? 'bg-green-500' : ''}`}></div>
                              </td>
@@ -174,7 +178,7 @@ export const ProjectList: React.FC = () => {
                                      <div className={`p-1.5 rounded bg-opacity-10 ${project.iconColor.replace('text-', 'bg-')}`}>
                                         <Code2 size={18} className={project.iconColor} />
                                      </div>
-                                     <span className="text-sm font-medium text-slate-800">{project.name}</span>
+                                     <span className="text-sm font-medium text-slate-800 hover:text-blue-600 transition-colors">{project.name}</span>
                                      {project.isStar && <Star size={14} className="text-slate-400 fill-slate-100" />}
                                  </div>
                              </td>

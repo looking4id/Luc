@@ -16,6 +16,7 @@ import {
   Filter,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Clock,
   CheckCircle2,
   Circle,
@@ -41,7 +42,22 @@ import {
   Layers,
   Target,
   FileEdit,
-  Briefcase
+  Briefcase,
+  LayoutDashboard,
+  Map,
+  CheckSquare,
+  Bug,
+  Repeat,
+  FlaskConical,
+  GitBranch,
+  Flag,
+  ShieldAlert,
+  PlayCircle,
+  AlertTriangle,
+  Zap,
+  Home,
+  Grid,
+  List
 } from 'lucide-react';
 
 export {
@@ -61,6 +77,7 @@ export {
   Filter,
   ChevronDown,
   ChevronRight,
+  ChevronLeft,
   Clock,
   CheckCircle2,
   Circle,
@@ -86,11 +103,26 @@ export {
   Layers,
   Target,
   FileEdit,
-  Briefcase
+  Briefcase,
+  LayoutDashboard,
+  Map,
+  CheckSquare,
+  Bug,
+  Repeat,
+  FlaskConical,
+  GitBranch,
+  Flag,
+  ShieldAlert,
+  PlayCircle,
+  AlertTriangle,
+  Zap,
+  Home,
+  Grid,
+  List
 };
 
 export const GLogo = () => (
-  <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-900/20">
     G
   </div>
 );

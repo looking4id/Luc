@@ -10,14 +10,15 @@ interface CreateTaskModalProps {
   onClose: () => void;
   onSubmit: (task: Task) => void;
   defaultType?: TaskType | null;
+  defaultProjectId?: string;
 }
 
-export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ columnTitle, onClose, onSubmit, defaultType }) => {
+export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ columnTitle, onClose, onSubmit, defaultType, defaultProjectId }) => {
   const [title, setTitle] = useState('');
   const [type, setType] = useState<TaskType>(defaultType || TaskType.Task);
   const [priority, setPriority] = useState<Priority>(Priority.Normal);
   const [description, setDescription] = useState('');
-  const [projectId, setProjectId] = useState(MOCK_PROJECTS[0].id);
+  const [projectId, setProjectId] = useState(defaultProjectId || MOCK_PROJECTS[0].id);
   
   // Update local type state if defaultType prop changes (e.g. from dropdown)
   useEffect(() => {
@@ -863,7 +864,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             {...provided.dragHandleProps}
                             style={{ ...provided.draggableProps.style }}
                           >
-                             <KanbanCard task={task} onClick={setSelectedTask} />
+                             <KanbanCard task={task} onClick={setSelectedTask} onUpdate={handleUpdateTask} />
                           </div>
                         )}
                       </Draggable>
