@@ -57,7 +57,10 @@ import {
   Zap,
   Home,
   Grid,
-  List
+  List,
+  Link,
+  Lock,
+  Printer
 } from 'lucide-react';
 
 export {
@@ -118,7 +121,10 @@ export {
   Zap,
   Home,
   Grid,
-  List
+  List,
+  Link,
+  Lock,
+  Printer
 };
 
 export const GLogo = () => (

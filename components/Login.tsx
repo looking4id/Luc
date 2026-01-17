@@ -80,35 +80,34 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       {/* Main Card */}
       <div className="bg-white rounded-[4px] shadow-2xl shadow-slate-200/50 w-[960px] h-[580px] flex overflow-hidden">
         
-        {/* Left Side: Illustration */}
-        <div className="w-[45%] relative bg-white p-8 flex flex-col justify-between items-center border-r border-slate-50">
-           <div className="w-full flex justify-start">
-               <div className="flex items-center gap-2">
-                   <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center transform rotate-45">
-                        <div className="w-3 h-3 bg-white rounded-sm transform -rotate-45"></div>
-                   </div>
-                   <span className="text-xl font-bold text-slate-700 tracking-tight">Luky</span>
-               </div>
-           </div>
-           
-           <div className="flex-1 flex items-center justify-center w-full max-w-[320px]">
-               {/* Using a high-quality placeholder illustration that matches the 'dashboard/analytics' vibe */}
-               <img 
-                 src="https://ouch-cdn2.icons8.com/6-dM3iZp_y-tXq_5A5m8qk5Xw_7Qj_9a5m8qk5Xw_7Qj.png" 
-                 alt="Login Illustration" 
-                 className="w-full object-contain drop-shadow-sm opacity-90"
-                 // Fallback to a clean placeholder if external image fails
-                 onError={(e) => {
-                     e.currentTarget.src = "https://placehold.co/400x300/f8fafc/94a3b8?text=Project+Management";
-                 }}
-               />
-           </div>
-           
-           <div className="h-4"></div> {/* Spacer */}
+        {/* Left Side: Illustration - Recreated based on TAPD Prototype */}
+        <div className="w-[45%] relative bg-gradient-to-br from-blue-50 to-white p-10 flex flex-col overflow-hidden border-r border-slate-100">
+             {/* Decorative Blurs */}
+             <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-100/50 rounded-full blur-3xl"></div>
+             <div className="absolute top-40 -left-10 w-32 h-32 bg-indigo-100/30 rounded-full blur-2xl"></div>
+
+             {/* Brand Text - Updated to LUK */}
+             <div className="z-10 mt-4 relative">
+                 <h1 className="text-4xl font-black text-blue-600 italic tracking-wider mb-2" style={{ fontFamily: '"Arial", sans-serif' }}>LUK</h1>
+                 <h2 className="text-3xl font-bold text-slate-800 mb-3 tracking-tight">让协作更敏捷</h2>
+                 <p className="text-xs text-slate-500 tracking-[0.4em] uppercase font-medium">助力团队高效协作</p>
+             </div>
+             
+             {/* 3D Illustration approximation */}
+             <div className="absolute top-1/4 left-0 right-0 bottom-0 flex items-end justify-center pointer-events-none">
+                 <div className="relative w-full h-full flex items-end justify-center">
+                    {/* Lightened image using CSS filters */}
+                     <img 
+                         src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         alt="Collaboration 3D" 
+                         className="w-[110%] h-auto object-contain mb-8 drop-shadow-2xl mix-blend-multiply opacity-60 brightness-125 contrast-75 transform translate-y-6"
+                     />
+                 </div>
+             </div>
         </div>
 
         {/* Right Side: Login Form */}
-        <div className="w-[55%] p-12 flex flex-col justify-center relative">
+        <div className="w-[55%] p-12 flex flex-col justify-center relative bg-white">
             
             <h2 className="text-[26px] font-medium text-slate-800 mb-2">登录</h2>
             

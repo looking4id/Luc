@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   LayoutDashboard, Map, FileText, CheckSquare, Bug, Repeat, FlaskConical, GitBranch, Flag, ShieldAlert, GitPullRequest, PlayCircle, BarChart2, Users, Settings,
   Search, Bell, AiIcon, HelpCircle, Plus, MoreHorizontal, Maximize2, Zap, Clock, AlertTriangle, CheckCircle2, ChevronRight, Home, Activity, Box, Filter, ArrowUpDown, Download, Calendar, Trash2, Edit3, Target,
-  LayoutList, Grid, List, ListFilter, ClipboardList, ChevronDown
+  LayoutList, Grid, List, ListFilter, ClipboardList, ChevronDown, RefreshCw, ChevronLeft, Layers, Link, Lock, Printer, Share2
 } from './Icons';
 import { Project, User, TaskType, Task, Priority } from '../types';
 import { MOCK_COLUMNS, MOCK_USERS } from '../constants';
@@ -39,20 +39,41 @@ const DonutChart = ({ percentage, color, label }: { percentage: number; color: s
         </svg>
         <span className="absolute text-lg font-bold text-slate-700">{percentage}%</span>
       </div>
-      <span className="text-xs text-slate-500 mt-1">{label}</span>
+      <span className="text-sm text-slate-500 mt-1">{label}</span>
     </div>
   );
 };
 
+const StatRing = ({ total, label, colorClass, subLabel }: { total: number, label: string, colorClass: string, subLabel: string }) => {
+    return (
+        <div className="flex items-center gap-6">
+            <div className="relative w-24 h-24 flex items-center justify-center">
+                 {/* Background Circle */}
+                <div className="absolute inset-0 rounded-full border-[8px] border-slate-100"></div>
+                 {/* Active Circle (Simulated for non-zero) */}
+                 {total > 0 && (
+                     <div className={`absolute inset-0 rounded-full border-[8px] border-transparent border-t-${colorClass} border-r-${colorClass} rotate-45`}></div>
+                 )}
+                 {/* Inner Content */}
+                 <div className="text-3xl font-bold text-slate-800 z-10">{total}</div>
+            </div>
+            <div>
+                 <div className="font-bold text-base text-slate-800 mb-1">{label}</div>
+                 <div className="text-xs text-slate-400">{subLabel}</div>
+            </div>
+        </div>
+    );
+};
+
 const StatusBadge = ({ status }: { status: string }) => {
     let colorClass = 'bg-slate-100 text-slate-600';
-    if (status === '进行中' || status === '处理中') colorClass = 'bg-blue-50 text-blue-600 border-blue-200';
+    if (status === '进行中' || status === '处理中' || status === '开启') colorClass = 'bg-blue-50 text-blue-600 border-blue-200';
     if (status === '已完成' || status === '已关闭' || status === '通过') colorClass = 'bg-green-50 text-green-600 border-green-200';
     if (status === '已逾期' || status === '失败' || status === 'Warning') colorClass = 'bg-red-50 text-red-600 border-red-200';
     if (status === '未开始' || status === '已识别') colorClass = 'bg-gray-50 text-gray-500 border-gray-200';
     
     return (
-        <span className={`text-xs px-2 py-0.5 rounded border ${colorClass}`}>
+        <span className={`text-xs px-2.5 py-1 rounded border ${colorClass}`}>
             {status}
         </span>
     );
@@ -60,12 +81,12 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const PriorityBadge = ({ priority }: { priority?: Priority }) => {
     if (priority === Priority.Urgent) {
-      return <span className="text-[10px] px-1 py-0.5 rounded border border-red-200 text-red-600 bg-red-50 font-medium">紧急</span>;
+      return <span className="text-xs px-1.5 py-0.5 rounded border border-red-200 text-red-600 bg-red-50 font-medium">紧急</span>;
     }
     if (priority === Priority.High) {
-      return <span className="text-[10px] px-1 py-0.5 rounded border border-orange-200 text-orange-500 bg-orange-50 font-medium">高</span>;
+      return <span className="text-xs px-1.5 py-0.5 rounded border border-orange-200 text-orange-500 bg-orange-50 font-medium">高</span>;
     }
-    return <span className="text-[10px] px-1 py-0.5 rounded border border-slate-200 text-slate-500 bg-slate-50 font-medium">普通</span>;
+    return <span className="text-xs px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 bg-slate-50 font-medium">普通</span>;
 };
 
 // --- Mock Data ---
@@ -117,9 +138,9 @@ const MOCK_REPORTS = [
 const ProjectOverview: React.FC<{ project: Project }> = ({ project }) => (
     <div className="grid grid-cols-12 gap-6">
         {/* Row 1: Project Info & Charts */}
-        <div className="col-span-12 md:col-span-4 bg-white rounded-lg border border-slate-200 shadow-sm p-5">
+        <div className="col-span-12 md:col-span-4 bg-white rounded-lg border border-slate-200 shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
                     <div className="w-1 h-4 bg-slate-300 rounded-full"></div>
                     项目信息
                 </h3>
@@ -132,7 +153,7 @@ const ProjectOverview: React.FC<{ project: Project }> = ({ project }) => (
                 <DonutChart percentage={100} color="#3b82f6" label="工作项类型" />
             </div>
 
-            <div className="space-y-4 text-sm">
+            <div className="space-y-5 text-[15px]">
                 <div className="flex justify-between items-center border-b border-slate-50 pb-2">
                     <span className="text-slate-500">项目负责人:</span>
                     <div className="flex items-center gap-2">
@@ -151,9 +172,9 @@ const ProjectOverview: React.FC<{ project: Project }> = ({ project }) => (
             </div>
         </div>
 
-        <div className="col-span-12 md:col-span-8 bg-white rounded-lg border border-slate-200 shadow-sm p-5">
+        <div className="col-span-12 md:col-span-8 bg-white rounded-lg border border-slate-200 shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
                     <div className="w-1 h-4 bg-slate-300 rounded-full"></div>
                     报表分析
                 </h3>
@@ -205,9 +226,9 @@ const ProjectOverview: React.FC<{ project: Project }> = ({ project }) => (
         </div>
 
         {/* Row 2: Sprint */}
-        <div className="col-span-12 bg-white rounded-lg border border-slate-200 shadow-sm p-5">
+        <div className="col-span-12 bg-white rounded-lg border border-slate-200 shadow-sm p-6">
                 <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
                     <div className="w-1 h-4 bg-slate-300 rounded-full"></div>
                     迭代
                 </h3>
@@ -217,26 +238,26 @@ const ProjectOverview: React.FC<{ project: Project }> = ({ project }) => (
                 </div>
                 </div>
                 
-                <div className="bg-slate-50 rounded-lg p-4 flex items-center justify-between border border-slate-100 hover:border-blue-200 transition-colors cursor-pointer">
+                <div className="bg-slate-50 rounded-lg p-5 flex items-center justify-between border border-slate-100 hover:border-blue-200 transition-colors cursor-pointer">
                     <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-orange-500 rounded flex items-center justify-center text-white font-bold text-lg">Sp</div>
+                        <div className="w-12 h-12 bg-orange-500 rounded flex items-center justify-center text-white font-bold text-xl">Sp</div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <span className="font-bold text-slate-800">Sprint1: 功能优化</span>
+                                <span className="font-bold text-slate-800 text-base">Sprint1: 功能优化</span>
                                 <span className="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded border border-blue-200">进行中</span>
                             </div>
-                            <div className="text-xs text-slate-500 mt-1">修复微信小程序在线点餐系统所存在的缺陷...</div>
+                            <div className="text-sm text-slate-500 mt-1">修复微信小程序在线点餐系统所存在的缺陷...</div>
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-12">
+                    <div className="flex items-center gap-16">
                         <div className="text-center">
                             <div className="text-xs text-slate-500 mb-1">需求数</div>
-                            <div className="font-bold text-slate-800">5</div>
+                            <div className="font-bold text-slate-800 text-base">5</div>
                         </div>
                         <div className="text-center">
                             <div className="text-xs text-slate-500 mb-1">总缺陷</div>
-                            <div className="font-bold text-slate-800">3</div>
+                            <div className="font-bold text-slate-800 text-base">3</div>
                         </div>
                         <div className="flex flex-col items-end min-w-[140px]">
                             <div className="flex justify-between w-full text-xs text-slate-500 mb-1">
@@ -292,7 +313,7 @@ const WorkItemList: React.FC<WorkItemListProps> = ({ project, type, tasks, onCre
             <div className="flex-1 overflow-auto">
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50 sticky top-0 z-10">
-                        <tr className="border-b border-slate-200 text-slate-500 text-xs font-semibold">
+                        <tr className="border-b border-slate-200 text-slate-600 text-sm font-semibold">
                             <th className="py-3 px-4 w-10"><input type="checkbox" /></th>
                             <th className="py-3 px-4 w-24">ID</th>
                             <th className="py-3 px-4">标题</th>
@@ -311,7 +332,7 @@ const WorkItemList: React.FC<WorkItemListProps> = ({ project, type, tasks, onCre
                                 <td className="py-3 px-4">
                                     <div 
                                         onClick={() => onTaskClick(task)}
-                                        className="text-sm font-medium text-slate-800 hover:text-blue-600 cursor-pointer"
+                                        className="text-[15px] font-medium text-slate-800 hover:text-blue-600 cursor-pointer"
                                     >
                                         {task.title}
                                     </div>
@@ -357,10 +378,10 @@ const WorkItemList: React.FC<WorkItemListProps> = ({ project, type, tasks, onCre
                 </table>
             </div>
             <div className="p-3 border-t border-slate-200 flex justify-between items-center bg-slate-50">
-                <span className="text-xs text-slate-500">共 {displayTasks.length} 条</span>
+                <span className="text-sm text-slate-500">共 {displayTasks.length} 条</span>
                 <div className="flex gap-1">
-                    <button className="px-2 py-1 border border-slate-300 rounded bg-white text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-50">上一页</button>
-                    <button className="px-2 py-1 border border-slate-300 rounded bg-white text-xs text-slate-600 hover:bg-slate-50">下一页</button>
+                    <button className="px-3 py-1.5 border border-slate-300 rounded bg-white text-xs text-slate-600 hover:bg-slate-50 disabled:opacity-50">上一页</button>
+                    <button className="px-3 py-1.5 border border-slate-300 rounded bg-white text-xs text-slate-600 hover:bg-slate-50">下一页</button>
                 </div>
             </div>
         </div>
@@ -370,7 +391,7 @@ const WorkItemList: React.FC<WorkItemListProps> = ({ project, type, tasks, onCre
 const ProjectPlanning = () => (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800">项目规划 (Roadmap)</h3>
+            <h3 className="font-bold text-slate-800 text-lg">项目规划 (Roadmap)</h3>
             <div className="flex gap-2">
                  <button className="px-3 py-1.5 border border-slate-300 rounded text-sm flex items-center gap-1 hover:bg-slate-50">
                      <Calendar size={14} /> 按月视图
@@ -387,8 +408,8 @@ const ProjectPlanning = () => (
                             {[1, 2].map(i => (
                                 <div key={i} className="flex gap-4">
                                     <div className="w-1/4">
-                                        <div className="font-bold text-slate-700">核心功能迭代 v1.{i}</div>
-                                        <div className="text-xs text-slate-500 mt-1">2025-0{7+i}-01 ~ 2025-0{8+i}-01</div>
+                                        <div className="font-bold text-slate-700 text-base">核心功能迭代 v1.{i}</div>
+                                        <div className="text-sm text-slate-500 mt-1">2025-0{7+i}-01 ~ 2025-0{8+i}-01</div>
                                     </div>
                                     <div className="flex-1 relative h-12 bg-slate-50 rounded border border-slate-100">
                                         <div 
@@ -409,52 +430,292 @@ const ProjectPlanning = () => (
     </div>
 );
 
-const ProjectIterations = () => (
-     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-         {[
-             { name: 'Sprint 1: 基础功能', status: '进行中', progress: 65, start: '2025/08/01', end: '2025/08/14' },
-             { name: 'Sprint 2: 支付模块', status: '未开始', progress: 0, start: '2025/08/15', end: '2025/08/28' },
-             { name: 'Sprint 3: 报表优化', status: '未开始', progress: 0, start: '2025/08/29', end: '2025/09/12' },
-         ].map((sprint, i) => (
-             <div key={i} className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer">
-                 <div className="flex justify-between items-start mb-4">
-                     <div>
-                         <div className="font-bold text-slate-800 text-lg mb-1">{sprint.name}</div>
-                         <StatusBadge status={sprint.status} />
+// --- New Component: Iteration Dashboard (Detailed View) ---
+
+const IterationDashboard = ({ onBack }: { onBack: () => void }) => {
+    const tabs = ['概览', '列表', '看板', '成员任务跟踪', '工时报告', '进度图', '仪表盘'];
+    const [activeTab, setActiveTab] = useState('概览');
+
+    return (
+        <div className="flex flex-col h-full bg-slate-50 overflow-y-auto custom-scrollbar">
+            {/* Iteration Header */}
+            <div className="bg-white border-b border-slate-200 px-6 pt-5 pb-0 shadow-sm sticky top-0 z-10">
+                <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                        <div 
+                            className="bg-blue-500 text-white p-2 rounded-lg shadow-sm cursor-pointer hover:bg-blue-600 transition-colors"
+                            onClick={onBack}
+                        >
+                             {/* Placeholder Project Icon */}
+                             <Layers size={24} />
+                        </div>
+                        <div>
+                             <div className="flex items-center gap-2 mb-1">
+                                 <h2 className="text-xl font-bold text-slate-800">【买家应用】迭代2</h2>
+                                 <Link size={14} className="text-slate-400 hover:text-blue-500 cursor-pointer" />
+                                 <Lock size={14} className="text-slate-400" />
+                             </div>
+                             <div className="flex items-center gap-4 text-xs text-slate-500 font-mono">
+                                 <span>2025-12-08 ~ 2025-12-19</span>
+                             </div>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded">
+                            <Edit3 size={18} />
+                        </button>
+                        <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded">
+                            <Printer size={18} />
+                        </button>
+                        <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded">
+                            <Share2 size={18} />
+                        </button>
+                        <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded">
+                            <MoreHorizontal size={18} />
+                        </button>
+                         <button className="px-3 py-1.5 bg-white border border-blue-500 text-blue-500 text-sm rounded hover:bg-blue-50 font-medium">
+                            开启
+                        </button>
+                         <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded">
+                            <Settings size={18} />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                    {tabs.map(tab => (
+                        <div 
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`pb-3 cursor-pointer text-sm font-medium border-b-2 transition-colors ${
+                                activeTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+                            }`}
+                        >
+                            {tab}
+                        </div>
+                    ))}
+                    <button className="ml-auto mb-2 text-slate-400 hover:text-blue-600"><Plus size={16} /></button>
+                     <button className="mb-2 text-slate-400 hover:text-slate-600"><Settings size={16} /></button>
+                </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-6 space-y-6">
+                
+                {/* Top Cards Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                     {/* Delayed */}
+                     <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+                         <div className="flex flex-col justify-between h-full">
+                             <div className="font-bold text-slate-800 text-base mb-4">延期工作</div>
+                             <div className="w-24 h-24 rounded-full border-8 border-slate-100 flex items-center justify-center">
+                                 <span className="text-3xl font-bold text-slate-800">0</span>
+                             </div>
+                         </div>
                      </div>
-                     <MoreHorizontal size={16} className="text-slate-400 hover:text-slate-600" />
+                     
+                     {/* Unfinished */}
+                     <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm">
+                         <div className="font-bold text-slate-800 text-base mb-4">未完成需求</div>
+                         <div className="flex justify-center">
+                             <StatRing total={3} label="3" colorClass="blue-500" subLabel="需求 3" />
+                         </div>
+                     </div>
+
+                     {/* Stagnant */}
+                      <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+                         <div className="font-bold text-slate-800 text-base mb-4">状态停留超过三天</div>
+                          <div className="flex justify-center">
+                             <div className="w-24 h-24 rounded-full border-8 border-slate-100 flex items-center justify-center">
+                                 <span className="text-3xl font-bold text-slate-800">0</span>
+                             </div>
+                          </div>
+                     </div>
+
+                     {/* Total Work */}
+                      <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-sm">
+                         <div className="font-bold text-slate-800 text-base mb-4">总工作</div>
+                         <div className="flex justify-center">
+                             <StatRing total={3} label="3" colorClass="blue-500" subLabel="需求 3" />
+                         </div>
+                     </div>
+                </div>
+
+                {/* Timeline Section */}
+                <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                    <div className="font-bold text-slate-800 text-base mb-6">关键时间</div>
+                    <div className="relative flex items-center justify-between px-20 py-8">
+                         {/* Line */}
+                         <div className="absolute left-[20%] right-[20%] h-0.5 bg-blue-500 top-1/2 -translate-y-1/2 z-0"></div>
+                         
+                         {/* Stamp */}
+                         <div className="absolute left-20 top-0 border-2 border-green-500 text-green-500 rounded-full w-24 h-24 flex items-center justify-center transform -rotate-12 opacity-80 z-0">
+                             <div className="text-center leading-none">
+                                 <div className="text-xs font-bold mb-1">PUBLISHED</div>
+                                 <div className="text-xl font-black">已发布</div>
+                             </div>
+                         </div>
+
+                         {/* Start Node */}
+                         <div className="relative z-10 flex flex-col items-center gap-2">
+                             <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md">
+                                 <CheckCircle2 size={16} />
+                             </div>
+                             <div className="text-center">
+                                 <div className="font-bold text-slate-700">开始时间</div>
+                                 <div className="text-xs text-slate-500 font-mono mt-1">2025-12-08</div>
+                             </div>
+                         </div>
+
+                         {/* End Node */}
+                         <div className="relative z-10 flex flex-col items-center gap-2">
+                             <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-md">
+                                 <CheckCircle2 size={16} />
+                             </div>
+                             <div className="text-center">
+                                 <div className="font-bold text-slate-700">结束时间</div>
+                                 <div className="text-xs text-slate-500 font-mono mt-1">2025-12-19</div>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+
+                {/* Info Split Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Basic Info */}
+                    <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm min-h-[300px] flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
+                            <h3 className="font-bold text-slate-800 text-base">基本信息</h3>
+                        </div>
+                        
+                        <div className="bg-slate-50/50 p-4 rounded-lg flex items-start gap-4 mb-8">
+                             <div className="w-10 h-10 rounded bg-blue-500 flex items-center justify-center text-white">
+                                 <Layers size={20} />
+                             </div>
+                             <div>
+                                 <div className="flex items-center gap-2 mb-1">
+                                    <span className="font-bold text-slate-800">【买家应用】迭代2</span>
+                                    <span className="text-xs text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded-full">开启</span>
+                                    <span className="text-xs text-orange-500 flex items-center gap-1 cursor-pointer hover:underline">
+                                        <Lock size={10} /> 需求范围
+                                    </span>
+                                 </div>
+                                 <div className="text-xs text-slate-500 mt-4 flex items-center gap-8">
+                                     <span className="flex items-center gap-1"><Users size={12}/> 创建人 TAPD</span>
+                                     <span className="flex items-center gap-1"><Calendar size={12}/> 创建时间 2026-01-01 14:01:47</span>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <div className="flex-1"></div>
+
+                        {/* Progress Bars */}
+                        <div className="mt-auto space-y-4">
+                             <div className="flex items-center gap-4">
+                                 <div className="w-24 text-4xl font-bold text-slate-800">0/8</div>
+                                 <div className="flex-1">
+                                     <div className="flex justify-between text-xs text-slate-500 mb-1">
+                                         <span>需求</span>
+                                         <span>0/3</span>
+                                     </div>
+                                     <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                         <div className="h-full bg-blue-500 w-[0%]"></div>
+                                     </div>
+                                 </div>
+                             </div>
+                             <div className="flex items-center gap-4">
+                                 <div className="w-24 text-4xl font-bold text-slate-800">0/0</div>
+                                 <div className="flex-1">
+                                     <div className="flex justify-between text-xs text-slate-500 mb-1">
+                                         <span>缺陷</span>
+                                         <span>0/0</span>
+                                     </div>
+                                      <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                         <div className="h-full bg-red-500 w-[0%]"></div>
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+
+                    {/* Iteration Goal */}
+                     <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm min-h-[300px]">
+                        <div className="flex justify-between items-start mb-6">
+                            <h3 className="font-bold text-slate-800 text-base">迭代目标</h3>
+                            <div className="flex gap-2">
+                                <button className="p-1 text-slate-400 hover:text-slate-600"><Maximize2 size={14}/></button>
+                                <button className="p-1 text-slate-400 hover:text-slate-600"><Edit3 size={14}/></button>
+                                <button className="p-1 text-slate-400 hover:text-slate-600"><MoreHorizontal size={14}/></button>
+                            </div>
+                        </div>
+                        <div className="text-sm text-slate-600">
+                            完成买家应用主要功能开发
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ProjectIterations = () => {
+     const [selectedSprintId, setSelectedSprintId] = useState<string | null>(null);
+
+     if (selectedSprintId) {
+         return <IterationDashboard onBack={() => setSelectedSprintId(null)} />;
+     }
+
+     return (
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {[
+                 { id: 'sp1', name: 'Sprint 1: 功能优化', status: '进行中', progress: 65, start: '2025/08/01', end: '2025/08/14' },
+                 { id: 'sp2', name: '【买家应用】迭代2', status: '未开始', progress: 0, start: '2025/12/08', end: '2025/12/19' }, // Matches prototype name
+                 { id: 'sp3', name: 'Sprint 3: 报表优化', status: '未开始', progress: 0, start: '2025/08/29', end: '2025/09/12' },
+             ].map((sprint, i) => (
+                 <div 
+                    key={i} 
+                    onClick={() => setSelectedSprintId(sprint.id)}
+                    className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer group"
+                 >
+                     <div className="flex justify-between items-start mb-4">
+                         <div>
+                             <div className="font-bold text-slate-800 text-lg mb-1 group-hover:text-blue-600 transition-colors">{sprint.name}</div>
+                             <StatusBadge status={sprint.status} />
+                         </div>
+                         <MoreHorizontal size={16} className="text-slate-400 hover:text-slate-600" />
+                     </div>
+                     <div className="space-y-4">
+                         <div className="flex justify-between text-sm text-slate-500">
+                             <span>时间:</span>
+                             <span className="font-mono">{sprint.start} - {sprint.end}</span>
+                         </div>
+                         <div>
+                             <div className="flex justify-between text-xs text-slate-500 mb-1">
+                                 <span>完成度</span>
+                                 <span>{sprint.progress}%</span>
+                             </div>
+                             <div className="w-full bg-slate-100 rounded-full h-2">
+                                 <div className="bg-blue-600 h-2 rounded-full transition-all" style={{ width: `${sprint.progress}%` }}></div>
+                             </div>
+                         </div>
+                         <div className="pt-4 border-t border-slate-50 flex justify-between items-center text-sm">
+                             <div className="flex -space-x-2">
+                                 {[1,2,3].map(u => (
+                                     <div key={u} className="w-6 h-6 rounded-full bg-slate-200 border border-white"></div>
+                                 ))}
+                             </div>
+                             <span className="text-blue-600 hover:underline">详情 &gt;</span>
+                         </div>
+                     </div>
                  </div>
-                 <div className="space-y-4">
-                     <div className="flex justify-between text-sm text-slate-500">
-                         <span>时间:</span>
-                         <span className="font-mono">{sprint.start} - {sprint.end}</span>
-                     </div>
-                     <div>
-                         <div className="flex justify-between text-xs text-slate-500 mb-1">
-                             <span>完成度</span>
-                             <span>{sprint.progress}%</span>
-                         </div>
-                         <div className="w-full bg-slate-100 rounded-full h-2">
-                             <div className="bg-blue-600 h-2 rounded-full transition-all" style={{ width: `${sprint.progress}%` }}></div>
-                         </div>
-                     </div>
-                     <div className="pt-4 border-t border-slate-50 flex justify-between items-center text-sm">
-                         <div className="flex -space-x-2">
-                             {[1,2,3].map(u => (
-                                 <div key={u} className="w-6 h-6 rounded-full bg-slate-200 border border-white"></div>
-                             ))}
-                         </div>
-                         <span className="text-blue-600 hover:underline">详情 &gt;</span>
-                     </div>
-                 </div>
+             ))}
+             <div className="border-2 border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 cursor-pointer min-h-[200px] transition-colors">
+                 <Plus size={32} className="mb-2" />
+                 <span>创建新迭代</span>
              </div>
-         ))}
-         <div className="border-2 border-dashed border-slate-200 rounded-lg flex flex-col items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 cursor-pointer min-h-[200px] transition-colors">
-             <Plus size={32} className="mb-2" />
-             <span>创建新迭代</span>
          </div>
-     </div>
-);
+     );
+};
 
 // --- Test Management Components ---
 
@@ -488,17 +749,17 @@ const TestCaseView = () => (
          {/* Table */}
          <div className="flex-1 overflow-auto">
              <table className="w-full text-left border-collapse">
-                 <thead className="bg-slate-50 text-xs text-slate-500 font-semibold border-b border-slate-200 sticky top-0 z-10">
+                 <thead className="bg-slate-50 text-sm text-slate-500 font-semibold border-b border-slate-200 sticky top-0 z-10">
                      <tr>
-                         <th className="py-3 px-6 w-32">用例编号</th>
-                         <th className="py-3 px-4">用例标题</th>
-                         <th className="py-3 px-4 w-24">版本号</th>
-                         <th className="py-3 px-4 w-40">当前版本评审结果</th>
-                         <th className="py-3 px-4 w-24">用例类型</th>
+                         <th className="py-3 px-6 w-32">ID</th>
+                         <th className="py-3 px-4">标题</th>
+                         <th className="py-3 px-4 w-24">版本</th>
+                         <th className="py-3 px-4 w-40">评审状态</th>
+                         <th className="py-3 px-4 w-24">类型</th>
                          <th className="py-3 px-4 w-24">优先级</th>
                          <th className="py-3 px-4 w-32">维护人</th>
-                         <th className="py-3 px-4 w-20 text-center">被引用</th>
-                         <th className="py-3 px-4 w-12 text-right"><Settings size={14} /></th>
+                         <th className="py-3 px-4 w-20 text-center">被引用数</th>
+                         <th className="py-3 px-4 w-24 text-center">操作</th>
                      </tr>
                  </thead>
                  <tbody className="text-sm">
@@ -516,15 +777,13 @@ const TestCaseView = () => (
                                         {tc.id}
                                     </span>
                                 </td>
-                                <td className="py-3 px-4 font-medium text-slate-800 hover:text-pink-600 cursor-pointer transition-colors">
+                                <td className="py-3 px-4 font-medium text-slate-800 hover:text-pink-600 cursor-pointer transition-colors max-w-xs truncate" title={tc.title}>
                                     {tc.title}
                                 </td>
                                 <td className="py-3 px-4 text-slate-500">{tc.version}</td>
                                 <td className="py-3 px-4 text-slate-500">
                                     <div className="flex items-center gap-1.5">
-                                        <div className="w-3.5 h-3.5 rounded-full border border-slate-300 text-slate-400 flex items-center justify-center">
-                                            <Clock size={10} />
-                                        </div>
+                                        <div className={`w-2 h-2 rounded-full ${tc.reviewStatus === '待评审' ? 'bg-slate-300' : 'bg-green-500'}`}></div>
                                         {tc.reviewStatus}
                                     </div>
                                 </td>
@@ -543,10 +802,18 @@ const TestCaseView = () => (
                                     </div>
                                 </td>
                                 <td className="py-3 px-4 text-center text-slate-500">{tc.cited}</td>
-                                <td className="py-3 px-4 text-right">
-                                    <button className="text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <MoreHorizontal size={16} />
-                                    </button>
+                                <td className="py-3 px-4 text-center">
+                                    <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="执行用例">
+                                            <PlayCircle size={14} />
+                                        </button>
+                                        <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="编辑">
+                                            <Edit3 size={14} />
+                                        </button>
+                                        <button className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="删除">
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                          );
@@ -609,7 +876,7 @@ const TestReviewView = () => (
 const TestPlanView = () => (
     <div className="flex-1 overflow-auto">
         <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50 text-xs text-slate-500 font-semibold border-b border-slate-200 sticky top-0 z-10">
+            <thead className="bg-slate-50 text-sm text-slate-500 font-semibold border-b border-slate-200 sticky top-0 z-10">
                 <tr>
                     <th className="py-3 px-6 w-32">计划编号</th>
                     <th className="py-3 px-4">计划名称</th>
@@ -703,14 +970,14 @@ const ProjectTesting = () => {
         <div className="w-48 border-r border-slate-200 flex flex-col flex-shrink-0 bg-slate-50/50">
             <div className="h-12 flex items-center px-4 font-bold text-slate-800 gap-2 border-b border-slate-100 bg-white">
                 <FlaskConical size={18} className="text-pink-600" />
-                <span>测试管理</span>
+                <span className="text-base">测试管理</span>
             </div>
             <div className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
                 {subSidebarItems.map(item => (
                     <div 
                         key={item.id}
                         onClick={() => setActiveSubItem(item.id)}
-                        className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer text-sm transition-colors ${
+                        className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer text-base transition-colors ${
                             activeSubItem === item.id 
                             ? 'bg-pink-50 text-pink-700 font-medium' 
                             : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -730,7 +997,7 @@ const ProjectTesting = () => {
                  <div className="flex items-center gap-6">
                      <h2 className="text-lg font-bold text-slate-800">{activeSubItem}</h2>
                      {activeSubItem === '测试用例' && (
-                        <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-4 text-base">
                             <button 
                                 onClick={() => setActiveTab('list')}
                                 className={`pb-4 -mb-4 transition-colors ${activeTab === 'list' ? 'text-pink-600 border-b-2 border-pink-600 font-medium' : 'text-slate-500 hover:text-slate-800'}`}
@@ -767,7 +1034,7 @@ const ProjectTesting = () => {
 const ProjectVersions = () => (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm">
         <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800">发布版本</h3>
+            <h3 className="font-bold text-slate-800 text-lg">发布版本</h3>
             <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">发布新版本</button>
         </div>
         <div className="divide-y divide-slate-100">
@@ -805,7 +1072,7 @@ const ProjectVersions = () => (
 
 const ProjectMembers = () => (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
-        <h3 className="font-bold text-slate-800 mb-6">项目成员 (5)</h3>
+        <h3 className="font-bold text-slate-800 mb-6 text-lg">项目成员 (5)</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
              {MOCK_USERS.map(user => (
                  <div key={user.id} className="flex items-center gap-4 p-4 border border-slate-100 rounded-lg hover:border-blue-200 hover:shadow-sm transition-all group">
@@ -814,7 +1081,7 @@ const ProjectMembers = () => (
                      </div>
                      <div className="flex-1">
                          <div className="font-bold text-slate-800">{user.name}</div>
-                         <div className="text-xs text-slate-500">产品经理 / 管理员</div>
+                         <div className="text-sm text-slate-500">产品经理 / 管理员</div>
                      </div>
                      <button className="p-2 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                          <Trash2 size={16} />
@@ -835,24 +1102,24 @@ const ProjectSettings = ({ project }: { project: Project }) => (
         
         <div className="space-y-6">
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">项目名称</label>
-                <input type="text" defaultValue={project.name} className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-500 outline-none" />
+                <label className="block text-base font-medium text-slate-700 mb-1">项目名称</label>
+                <input type="text" defaultValue={project.name} className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-500 outline-none text-base" />
             </div>
             
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">项目标识 (Key)</label>
-                <input type="text" defaultValue={project.code} disabled className="w-full border border-slate-200 bg-slate-50 rounded px-3 py-2 text-slate-500" />
-                <p className="text-xs text-slate-400 mt-1">项目标识创建后不可修改。</p>
+                <label className="block text-base font-medium text-slate-700 mb-1">项目标识 (Key)</label>
+                <input type="text" defaultValue={project.code} disabled className="w-full border border-slate-200 bg-slate-50 rounded px-3 py-2 text-slate-500 text-base" />
+                <p className="text-sm text-slate-400 mt-1">项目标识创建后不可修改。</p>
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">描述</label>
-                <textarea className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-500 outline-none h-24" placeholder="简要描述项目目标..." defaultValue="这是一个示例敏捷开发项目..." />
+                <label className="block text-base font-medium text-slate-700 mb-1">描述</label>
+                <textarea className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-500 outline-none h-24 text-base" placeholder="简要描述项目目标..." defaultValue="这是一个示例敏捷开发项目..." />
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">项目负责人</label>
-                <select className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-500 outline-none">
+                <label className="block text-base font-medium text-slate-700 mb-1">项目负责人</label>
+                <select className="w-full border border-slate-300 rounded px-3 py-2 focus:border-blue-500 outline-none text-base">
                     {MOCK_USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                 </select>
             </div>
@@ -865,12 +1132,12 @@ const ProjectSettings = ({ project }: { project: Project }) => (
     </div>
 );
 
-// --- New Components: Milestones & Risks ---
+// --- New Components: Milestones & Risks & Others ---
 
 const ProjectMilestones = () => (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm h-full flex flex-col">
         <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
                 <Flag size={20} className="text-orange-500" /> 里程碑
             </h3>
             <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm flex items-center gap-2">
@@ -914,7 +1181,7 @@ const ProjectMilestones = () => (
 const ProjectRisks = () => (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full">
         <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
                 <ShieldAlert size={20} className="text-red-500" /> 风险管理
             </h3>
             <div className="flex items-center gap-3">
@@ -929,7 +1196,7 @@ const ProjectRisks = () => (
         </div>
         <div className="flex-1 overflow-auto">
             <table className="w-full text-left">
-                <thead className="bg-slate-50 text-xs text-slate-500 font-semibold border-b border-slate-200">
+                <thead className="bg-slate-50 text-sm text-slate-500 font-semibold border-b border-slate-200">
                     <tr>
                         <th className="py-3 px-4 w-24">ID</th>
                         <th className="py-3 px-4">风险标题</th>
@@ -980,10 +1247,174 @@ const ProjectRisks = () => (
     </div>
 );
 
+const ProjectCodeReview = () => (
+    <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full">
+        <div className="p-4 border-b border-slate-200 flex justify-between items-center">
+            <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                <GitPullRequest size={20} className="text-purple-500" /> 代码评审
+            </h3>
+             <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm flex items-center gap-2">
+                <Plus size={16} /> 发起评审
+            </button>
+        </div>
+        <div className="flex-1 overflow-auto">
+            <table className="w-full text-left">
+                <thead className="bg-slate-50 text-sm text-slate-500 font-semibold border-b border-slate-200">
+                    <tr>
+                        <th className="py-3 px-4 w-24">ID</th>
+                        <th className="py-3 px-4">标题</th>
+                        <th className="py-3 px-4 w-32">状态</th>
+                        <th className="py-3 px-4 w-32">发起人</th>
+                        <th className="py-3 px-4 w-32">评审人</th>
+                        <th className="py-3 px-4 w-40">更新时间</th>
+                        <th className="py-3 px-4 w-20 text-right">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {[
+                        { id: 'MR-101', title: 'feat: add user login api', status: 'Open', author: 'looking4id', reviewer: 'dev01', time: '10分钟前' },
+                        { id: 'MR-100', title: 'fix: payment callback error', status: 'Merged', author: 'dev01', reviewer: 'looking4id', time: '2小时前' },
+                        { id: 'MR-99', title: 'docs: update readme', status: 'Merged', author: 'pm01', reviewer: 'looking4id', time: '1天前' },
+                    ].map(mr => (
+                        <tr key={mr.id} className="border-b border-slate-100 hover:bg-slate-50 group">
+                            <td className="py-3 px-4 text-xs font-mono text-slate-500">{mr.id}</td>
+                            <td className="py-3 px-4">
+                                <div className="font-medium text-slate-700 hover:text-blue-600 cursor-pointer">{mr.title}</div>
+                            </td>
+                            <td className="py-3 px-4">
+                                <span className={`text-xs px-2 py-0.5 rounded border ${
+                                    mr.status === 'Open' ? 'bg-green-50 text-green-600 border-green-200' : 
+                                    'bg-purple-50 text-purple-600 border-purple-200'
+                                }`}>{mr.status}</span>
+                            </td>
+                             <td className="py-3 px-4 text-sm text-slate-600">{mr.author}</td>
+                             <td className="py-3 px-4 text-sm text-slate-600">{mr.reviewer}</td>
+                             <td className="py-3 px-4 text-sm text-slate-500">{mr.time}</td>
+                             <td className="py-3 px-4 text-right">
+                                <button className="p-1 text-slate-400 hover:text-slate-600"><MoreHorizontal size={16} /></button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    </div>
+);
+
+const ProjectPipeline = () => (
+    <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full">
+         <div className="p-4 border-b border-slate-200 flex justify-between items-center">
+            <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+                <PlayCircle size={20} className="text-blue-500" /> 流水线
+            </h3>
+             <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm flex items-center gap-2">
+                <PlayCircle size={16} /> 运行流水线
+            </button>
+        </div>
+        <div className="flex-1 overflow-auto p-6">
+            <div className="space-y-4">
+                {[
+                    { id: '#1024', name: 'Backend-CI-Master', status: 'Success', branch: 'master', trigger: 'Push by looking4id', time: '5分钟前', duration: '2m 30s' },
+                    { id: '#1023', name: 'Frontend-CI-Dev', status: 'Running', branch: 'dev', trigger: 'Merge by dev01', time: '15分钟前', duration: 'Running' },
+                    { id: '#1022', name: 'Backend-CI-Master', status: 'Failed', branch: 'master', trigger: 'Push by looking4id', time: '1小时前', duration: '1m 10s' },
+                ].map((p, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:shadow-sm">
+                        <div className="flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                p.status === 'Success' ? 'bg-green-100 text-green-600' :
+                                p.status === 'Running' ? 'bg-blue-100 text-blue-600 animate-pulse' :
+                                'bg-red-100 text-red-600'
+                            }`}>
+                                {p.status === 'Running' ? <RefreshCw size={20} className="animate-spin" /> : 
+                                 p.status === 'Success' ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-bold text-slate-800">{p.name}</span>
+                                    <span className="text-xs font-mono text-slate-500">{p.id}</span>
+                                </div>
+                                <div className="flex items-center gap-4 text-xs text-slate-500 mt-1">
+                                    <span className="flex items-center gap-1"><GitBranch size={12}/> {p.branch}</span>
+                                    <span>{p.trigger}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                             <div className={`text-sm font-medium mb-1 ${
+                                p.status === 'Success' ? 'text-green-600' :
+                                p.status === 'Running' ? 'text-blue-600' :
+                                'text-red-600'
+                             }`}>{p.status}</div>
+                             <div className="text-xs text-slate-500 flex items-center gap-2 justify-end">
+                                 <Clock size={12} /> {p.duration}
+                             </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
+
+const ProjectMetrics = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full overflow-auto p-1">
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+            <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <BarChart2 size={20} className="text-indigo-500" /> 需求交付周期
+            </h3>
+            <div className="h-64 flex items-end justify-between px-4 pb-6 border-b border-slate-100 relative">
+                {[5, 7, 4, 6, 8, 5, 3].map((h, i) => (
+                    <div key={i} className="w-8 bg-indigo-500 rounded-t hover:bg-indigo-600 transition-colors relative group" style={{ height: `${h * 10}%` }}>
+                        <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">{h}天</div>
+                    </div>
+                ))}
+            </div>
+             <div className="flex justify-between mt-2 text-xs text-slate-400 px-4">
+                <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+            </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+            <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <Activity size={20} className="text-green-500" /> 团队吞吐量
+            </h3>
+            <div className="h-64 flex items-end justify-between px-4 pb-6 border-b border-slate-100 relative">
+                {[12, 15, 10, 18, 20, 14, 8].map((h, i) => (
+                    <div key={i} className="w-8 bg-green-500 rounded-t hover:bg-green-600 transition-colors relative group" style={{ height: `${h * 4}%` }}>
+                         <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">{h}个</div>
+                    </div>
+                ))}
+            </div>
+             <div className="flex justify-between mt-2 text-xs text-slate-400 px-4">
+                <span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span>
+            </div>
+        </div>
+        
+         <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:col-span-2">
+             <div className="flex items-center justify-between mb-4">
+                 <h3 className="font-bold text-slate-800 flex items-center gap-2">缺陷密度分布</h3>
+             </div>
+             <div className="h-4 bg-slate-100 rounded-full overflow-hidden flex">
+                 <div className="bg-green-500 w-[60%]" title="低优先级"></div>
+                 <div className="bg-yellow-500 w-[25%]" title="中优先级"></div>
+                 <div className="bg-orange-500 w-[10%]" title="高优先级"></div>
+                 <div className="bg-red-500 w-[5%]" title="紧急"></div>
+             </div>
+             <div className="flex gap-6 mt-4 text-xs text-slate-500 justify-center">
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-green-500 rounded-full"></div> 低 (60%)</div>
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-yellow-500 rounded-full"></div> 中 (25%)</div>
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-orange-500 rounded-full"></div> 高 (10%)</div>
+                 <div className="flex items-center gap-2"><div className="w-3 h-3 bg-red-500 rounded-full"></div> 紧急 (5%)</div>
+             </div>
+         </div>
+    </div>
+);
+
 // --- Main Component ---
 
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack }) => {
   const [activeTab, setActiveTab] = useState('项目概览');
+  const [isProjectPlusMenuOpen, setIsProjectPlusMenuOpen] = useState(false);
   
   // State for Managing Tasks locally within Project Detail to support Edit/Create
   const [tasks, setTasks] = useState<Task[]>(MOCK_COLUMNS.flatMap(col => col.tasks));
@@ -1013,7 +1444,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
       setIsCreateModalOpen(true);
   };
 
-  const primaryMenuItems = [
+  // Consolidated Menu Logic
+  const menuItems = [
     { icon: LayoutDashboard, label: '项目概览' },
     { icon: FileText, label: '需求', count: tasks.filter(t => t.projectId === project.id && t.type === TaskType.Requirement).length },
     { icon: CheckSquare, label: '任务', count: tasks.filter(t => t.projectId === project.id && t.type === TaskType.Task).length },
@@ -1022,9 +1454,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
     { icon: FlaskConical, label: '测试' },
     { icon: Map, label: '规划' },
     { icon: GitBranch, label: '版本' },
-  ];
-
-  const secondaryMenuItems = [
     { icon: Flag, label: '里程碑', count: 5 },
     { icon: ShieldAlert, label: '风险', count: 4 },
     { icon: GitPullRequest, label: '代码评审', count: 1 },
@@ -1033,6 +1462,12 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
     { icon: Users, label: '成员', count: 5 },
     { icon: Settings, label: '项目设置' },
   ];
+
+  // Logic to split menu items into visible and hidden (More)
+  const visibleCount = 8;
+  const visibleItems = menuItems.slice(0, visibleCount);
+  const hiddenItems = menuItems.slice(visibleCount);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -1073,6 +1508,9 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
         case '版本': return <ProjectVersions />;
         case '里程碑': return <ProjectMilestones />;
         case '风险': return <ProjectRisks />;
+        case '代码评审': return <ProjectCodeReview />;
+        case '流水线': return <ProjectPipeline />;
+        case '效能度量': return <ProjectMetrics />;
         case '成员': return <ProjectMembers />;
         case '项目设置': return <ProjectSettings project={project} />;
         default: return (
@@ -1101,19 +1539,75 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                         {project.name.substring(0,1)}
                     </div>
                  </button>
-                 <span className="font-bold text-slate-800 truncate max-w-[120px]">{project.name}</span>
-                 <button className="w-6 h-6 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded text-slate-600">
-                     <Plus size={14} />
-                 </button>
+                 <span className="font-bold text-slate-800 text-lg truncate max-w-[120px]">{project.name}</span>
+                 
+                 {/* Project Action Menu */}
+                 <div className="relative">
+                     <button 
+                        onClick={() => setIsProjectPlusMenuOpen(!isProjectPlusMenuOpen)}
+                        className={`w-6 h-6 flex items-center justify-center rounded transition-colors ${isProjectPlusMenuOpen ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                     >
+                         <Plus size={14} />
+                     </button>
+                     
+                     {isProjectPlusMenuOpen && (
+                         <>
+                             <div className="fixed inset-0 z-40" onClick={() => setIsProjectPlusMenuOpen(false)}></div>
+                             <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 shadow-xl rounded-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+                                 <button
+                                    onClick={() => {
+                                        openCreateModal(TaskType.Requirement);
+                                        setIsProjectPlusMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                 >
+                                     <FileText size={16} className="text-blue-500" />
+                                     <span>创建需求</span>
+                                 </button>
+                                 <button
+                                    onClick={() => {
+                                        openCreateModal(TaskType.Defect);
+                                        setIsProjectPlusMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                 >
+                                     <Bug size={16} className="text-red-500" />
+                                     <span>创建缺陷</span>
+                                 </button>
+                                 <div className="h-px bg-slate-100 my-1"></div>
+                                 <button
+                                    onClick={() => {
+                                        setActiveTab('迭代');
+                                        setIsProjectPlusMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                 >
+                                     <Repeat size={16} className="text-purple-500" />
+                                     <span>创建迭代</span>
+                                 </button>
+                                 <button
+                                    onClick={() => {
+                                        setActiveTab('测试');
+                                        setIsProjectPlusMenuOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                 >
+                                     <FlaskConical size={16} className="text-green-500" />
+                                     <span>创建提测申请</span>
+                                 </button>
+                             </div>
+                         </>
+                     )}
+                 </div>
              </div>
 
              {/* Horizontal Menu */}
-             <div className="flex items-center gap-1 overflow-x-auto no-scrollbar mask-gradient">
-                 {primaryMenuItems.map(item => (
+             <div className="flex items-center gap-1">
+                 {visibleItems.map(item => (
                      <button
                         key={item.label}
                         onClick={() => setActiveTab(item.label)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded-md whitespace-nowrap transition-colors flex items-center gap-2 ${
+                        className={`px-3 py-1.5 text-base font-medium rounded-md whitespace-nowrap transition-colors flex items-center gap-2 ${
                             activeTab === item.label 
                             ? 'bg-blue-50 text-blue-600' 
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -1127,30 +1621,50 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack })
                  ))}
                  
                  {/* More Dropdown Trigger */}
-                 <div className="relative group ml-2">
-                     <button className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-900 font-medium px-2 py-1 rounded hover:bg-slate-50">
-                         <span>更多</span>
-                         <ChevronDown size={14} />
-                     </button>
-                     {/* Dropdown Content */}
-                     <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-lg py-1 hidden group-hover:block z-50">
-                         {secondaryMenuItems.map(item => (
-                             <button
-                                key={item.label}
-                                onClick={() => setActiveTab(item.label)}
-                                className="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-blue-600 flex items-center justify-between"
-                             >
-                                 <div className="flex items-center gap-2">
-                                     <item.icon size={16} />
-                                     <span>{item.label}</span>
+                 {hiddenItems.length > 0 && (
+                     <div className="relative ml-2">
+                         <button 
+                             onClick={() => setIsMoreOpen(!isMoreOpen)}
+                             className={`flex items-center gap-1 text-base font-medium px-2 py-1.5 rounded transition-colors ${
+                                 hiddenItems.some(i => i.label === activeTab) || isMoreOpen
+                                 ? 'text-blue-600 bg-blue-50'
+                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                             }`}
+                         >
+                             <span>更多</span>
+                             <ChevronDown size={14} className={`transition-transform duration-200 ${isMoreOpen ? 'rotate-180' : ''}`} />
+                         </button>
+                         
+                         {/* Dropdown Content */}
+                         {isMoreOpen && (
+                             <>
+                                 <div className="fixed inset-0 z-40" onClick={() => setIsMoreOpen(false)}></div>
+                                 <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100">
+                                     {hiddenItems.map(item => (
+                                         <button
+                                            key={item.label}
+                                            onClick={() => {
+                                                setActiveTab(item.label);
+                                                setIsMoreOpen(false);
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-base flex items-center justify-between hover:bg-slate-50 ${
+                                                activeTab === item.label ? 'text-blue-600 bg-blue-50/50' : 'text-slate-600'
+                                            }`}
+                                         >
+                                             <div className="flex items-center gap-2">
+                                                 <item.icon size={16} />
+                                                 <span>{item.label}</span>
+                                             </div>
+                                             {item.count !== undefined && (
+                                                 <span className="text-xs text-slate-400">{item.count}</span>
+                                             )}
+                                         </button>
+                                     ))}
                                  </div>
-                                 {item.count !== undefined && (
-                                     <span className="text-xs text-slate-400">{item.count}</span>
-                                 )}
-                             </button>
-                         ))}
+                             </>
+                         )}
                      </div>
-                 </div>
+                 )}
              </div>
          </div>
 

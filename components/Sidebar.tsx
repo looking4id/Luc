@@ -77,7 +77,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
       )}
 
       {/* Nav items */}
-      <nav className="flex-1 flex flex-col gap-1 w-full px-2 overflow-y-auto custom-scrollbar overflow-x-hidden">
+      <nav className="flex-1 flex flex-col gap-1 w-full px-2 overflow-y-auto no-scrollbar overflow-x-hidden">
         {menuItems.map((item, index) => {
           const isActive = activeItem === item.label;
           return (
@@ -184,7 +184,7 @@ export const SecondarySidebar: React.FC<SecondarySidebarProps> = ({
       </div>
 
       {/* Accordion Menu */}
-      <div className="flex-1 overflow-y-auto py-3 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto py-3 no-scrollbar">
         {/* System Views */}
         <div className="mb-4">
             <div 
