@@ -98,6 +98,12 @@ export const Monitor = createIcon(LucideIcons.Monitor);
 export const Smartphone = createIcon(LucideIcons.Smartphone);
 export const UserPlus = createIcon(LucideIcons.UserPlus);
 export const ShieldCheck = createIcon(LucideIcons.ShieldCheck);
+export const ZoomIn = createIcon(LucideIcons.ZoomIn);
+export const ZoomOut = createIcon(LucideIcons.ZoomOut);
+export const GitMerge = createIcon(LucideIcons.GitMerge);
+export const ArrowLeft = createIcon(LucideIcons.ArrowLeft);
+export const Check = createIcon(LucideIcons.Check);
+export const Ban = createIcon(LucideIcons.Ban);
 
 // 重新设计的玻璃拟态 Logo
 export const GLogo = () => (
