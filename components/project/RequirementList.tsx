@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, Filter, Plus, ChevronDown, ListFilter, 
   MoreHorizontal, Maximize2, ChevronRight, AlertTriangle,
@@ -25,9 +25,12 @@ interface RequirementListProps {
 }
 
 const MOCK_REQUIREMENTS: Requirement[] = [
-  { id: '1000039', title: '测试需求', type: 'STORY', priority: Priority.Normal, iteration: '-', status: '规划中', level: 0 },
-  { id: '1000002', title: '数据中心', type: 'EPIC', priority: Priority.High, iteration: '【存款产品】...', status: '规划中', level: 0 },
-  { id: '1000001', title: '用户平台开发', type: 'EPIC', priority: Priority.High, iteration: '-', status: '规划中', hasWarning: true, level: 0 },
+  { id: '1000039', title: '核心业务中台构建', type: 'EPIC', priority: Priority.High, iteration: '-', status: '规划中', level: 0, isExpanded: true, children: [
+    { id: '1000040', title: '用户中心模块开发', type: 'STORY', priority: Priority.Normal, iteration: 'Sprint 1', status: '开发中', level: 1 },
+    { id: '1000041', title: '权限校验子系统', type: 'STORY', priority: Priority.High, iteration: 'Sprint 1', status: '开发中', level: 1 },
+  ]},
+  { id: '1000002', title: '数据统计分析系统', type: 'EPIC', priority: Priority.High, iteration: '【存款产品】...', status: '规划中', level: 0 },
+  { id: '1000001', title: '移动端体验优化', type: 'EPIC', priority: Priority.High, iteration: '-', status: '规划中', hasWarning: true, level: 0 },
   { 
     id: '1000004', 
     title: '金融应用（社交、保险、分期）', 
@@ -39,12 +42,12 @@ const MOCK_REQUIREMENTS: Requirement[] = [
     level: 0,
     isExpanded: true,
     children: [
-      { id: '1000010', title: '金融应用-保险', type: 'STORY', priority: Priority.High, iteration: '【金融与应用...', status: '规划中', hasWarning: true, level: 1 },
+      { id: '1000010', title: '保险业务在线投保流程', type: 'STORY', priority: Priority.High, iteration: '【金融与应用...', status: '规划中', hasWarning: true, level: 1 },
     ]
   },
   { 
     id: '1000003', 
-    title: '支付安全', 
+    title: '支付安全升级', 
     type: 'EPIC', 
     priority: Priority.High, 
     iteration: '-', 
@@ -53,31 +56,49 @@ const MOCK_REQUIREMENTS: Requirement[] = [
     level: 0,
     isExpanded: true,
     children: [
-      { id: '1000009', title: '支付安全-系统安全加固', type: 'STORY', priority: Priority.Normal, iteration: '【支付安全】...', status: '规划中', hasWarning: true, level: 1 },
-      { id: '1000008', title: '支付安全-反欺诈风控', type: 'STORY', priority: Priority.High, iteration: '【支付安全】...', status: '规划中', level: 1 },
-      { id: '1000018', title: '支付安全-安全技术合规', type: 'STORY', priority: Priority.Normal, iteration: '【支付安全】...', status: '规划中', level: 1 },
+      { id: '1000009', title: '系统底层安全加固', type: 'STORY', priority: Priority.Normal, iteration: '【支付安全】...', status: '规划中', hasWarning: true, level: 1 },
+      { id: '1000008', title: '实时反欺诈风控模型', type: 'STORY', priority: Priority.High, iteration: '【支付安全】...', status: '规划中', level: 1 },
+      { id: '1000018', title: '全链路安全合规自查', type: 'STORY', priority: Priority.Normal, iteration: '【支付安全】...', status: '规划中', level: 1 },
     ]
   },
-  { 
-    id: '1000006', 
-    title: '清算平台', 
-    type: 'EPIC', 
-    priority: Priority.High, 
-    iteration: '-', 
-    status: '规划中', 
-    level: 0,
-    isExpanded: true,
-    children: [
-      { id: '1000014', title: '清算平台-合规处理', type: 'STORY', priority: Priority.High, iteration: '【存款产品】...', status: '规划中', level: 1 },
-      { id: '1000017', title: '清算平台-结算收入', type: 'STORY', priority: Priority.High, iteration: '【存款产品】...', status: '规划中', level: 1 },
-    ]
-  },
-  { id: '1000005', title: '交易平台', type: 'EPIC', priority: Priority.High, iteration: '-', status: '规划中', level: 0 },
 ];
 
 export const RequirementList: React.FC<RequirementListProps> = ({ onRequirementClick }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeCategory, setActiveCategory] = useState('所有的');
+  
+  // 列宽状态
+  const [colWidths, setColWidths] = useState([48, 120, 500, 100, 150, 100]);
+  const resizingRef = useRef<{ index: number; startX: number; startWidth: number } | null>(null);
+
+  const onMouseDown = (index: number, e: React.MouseEvent) => {
+    resizingRef.current = {
+      index,
+      startX: e.pageX,
+      startWidth: colWidths[index],
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (!resizingRef.current) return;
+    const { index, startX, startWidth } = resizingRef.current;
+    const deltaX = e.pageX - startX;
+    const newWidths = [...colWidths];
+    newWidths[index] = Math.max(40, startWidth + deltaX);
+    setColWidths(newWidths);
+  };
+
+  const onMouseUp = () => {
+    resizingRef.current = null;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  };
 
   const categories = [
     { name: '所有的', count: 21 },
@@ -86,10 +107,6 @@ export const RequirementList: React.FC<RequirementListProps> = ({ onRequirementC
     { name: '技术需求', count: 0 },
     { name: '交易平台', count: 6 },
     { name: '清算平台', count: 3 },
-    { name: '支付安全', count: 4 },
-    { name: '用户平台开发', count: 1 },
-    { name: '金融应用（社交、...', count: 0, isFull: '金融应用（社交、保险、分期）' },
-    { name: '商业运营（审...', count: 0 },
   ];
 
   const handleRowClick = (req: Requirement) => {
@@ -106,31 +123,94 @@ export const RequirementList: React.FC<RequirementListProps> = ({ onRequirementC
     }
   };
 
+  const renderRequirementRow = (req: Requirement) => {
+    return (
+      <tr 
+        key={req.id} 
+        className={`hover:bg-slate-50/80 transition-colors group cursor-pointer border-b border-slate-50 ${req.level > 0 ? 'bg-slate-50/20' : ''}`} 
+        onClick={() => handleRowClick(req)}
+      >
+        <td className="py-3 px-4 text-center"><input type="checkbox" className="rounded border-slate-300" onClick={(e) => e.stopPropagation()} /></td>
+        <td className="py-3 px-4 font-mono text-slate-500 font-bold truncate text-[11px]">{req.id}</td>
+        <td className="py-3 px-4 truncate relative">
+          <div className="flex items-center gap-1.5" style={{ paddingLeft: `${req.level * 28}px` }}>
+            {/* 树状层级连线逻辑 */}
+            {req.level > 0 && (
+              <>
+                <div className="absolute top-0 w-px bg-slate-200" style={{ left: `${(req.level * 28) - 14}px`, height: '50%' }}></div>
+                <div className="absolute w-3.5 h-px bg-slate-200" style={{ left: `${(req.level * 28) - 14}px`, top: '50%' }}></div>
+              </>
+            )}
+            
+            {req.children ? (
+              <div className={`p-0.5 rounded hover:bg-slate-200 transition-colors ${req.isExpanded ? 'bg-slate-100' : ''}`}>
+                <ChevronRight size={14} className={`text-slate-500 transition-transform ${req.isExpanded ? 'rotate-90' : ''}`} />
+              </div>
+            ) : (
+              <div className="w-4 h-4 flex items-center justify-center">
+                 <div className="w-1 h-1 rounded-full bg-slate-300"></div>
+              </div>
+            )}
+            
+            <span className={`px-1.5 py-0.5 rounded text-[9px] font-black text-white leading-none shadow-sm ${req.type === 'EPIC' ? 'bg-purple-500' : 'bg-blue-500'}`}>
+              {req.type}
+            </span>
+            <span className={`text-slate-700 font-semibold truncate group-hover:text-blue-600 transition-colors ${req.level === 0 ? 'text-sm' : 'text-xs'}`}>
+              {req.title}
+            </span>
+          </div>
+        </td>
+        <td className="py-3 px-4">
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+            req.priority === Priority.High ? 'bg-red-50 text-red-600 border-red-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+          }`}>{req.priority}</span>
+        </td>
+        <td className="py-3 px-4 text-slate-400 truncate text-xs font-medium">{req.iteration}</td>
+        <td className="py-3 px-4">
+          <span className="px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-black">{req.status}</span>
+        </td>
+      </tr>
+    );
+  };
+
+  const renderRequirements = (reqs: Requirement[]) => {
+    // Fix: Changed JSX.Element[] to React.ReactNode[] to avoid namespace error
+    let elements: React.ReactNode[] = [];
+    reqs.forEach(req => {
+      elements.push(renderRequirementRow(req));
+      if (req.isExpanded && req.children) {
+        elements.push(...req.children.map(child => renderRequirementRow(child)));
+      }
+    });
+    return elements;
+  };
+
   return (
     <div className="flex h-full bg-white -m-6 overflow-hidden">
       <div className={`transition-all duration-300 border-r border-slate-200 bg-white flex flex-col flex-shrink-0 ${isSidebarOpen ? 'w-64' : 'w-0'}`}>
         <div className="p-4 flex items-center justify-between border-b border-slate-100 flex-shrink-0 h-12">
           <div className="flex items-center gap-2 text-slate-800 font-bold text-sm">
             <LayoutGrid size={14} className="text-slate-400" />
-            <span>分类</span>
+            <span className="tracking-tight">分类视图</span>
           </div>
-          <Search size={16} className="text-slate-400 cursor-pointer hover:text-blue-500" />
+          <Search size={16} className="text-slate-400 cursor-pointer hover:text-blue-500 transition-colors" />
         </div>
         <div className="flex-1 overflow-y-auto py-2 px-1 custom-scrollbar">
           {categories.map((cat, idx) => (
             <div 
               key={idx}
               onClick={() => setActiveCategory(cat.name)}
-              className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer text-sm mb-0.5 transition-all group ${
-                activeCategory === cat.name ? 'bg-slate-100 text-slate-900 font-bold' : 'text-slate-500 hover:bg-slate-50'
+              className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm mb-0.5 transition-all group ${
+                activeCategory === cat.name ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-500 hover:bg-slate-50'
               }`}
             >
               <div className="flex items-center gap-2 truncate pr-2">
-                {idx === 0 ? <ChevronDown size={14} /> : <div className="w-3.5" />}
-                <span className="truncate" title={cat.isFull || cat.name}>{cat.name}</span>
+                {idx === 0 ? <ChevronDown size={14} className={activeCategory === cat.name ? 'text-blue-500' : 'text-slate-400'} /> : <div className="w-3.5" />}
+                <span className="truncate">{cat.name}</span>
               </div>
-              <span className="text-[11px] text-slate-400 font-medium">{cat.count > 0 ? cat.count : ''}</span>
-              {activeCategory === cat.name && idx > 0 && <MoreHorizontal size={14} className="ml-1 opacity-40 group-hover:opacity-100" />}
+              <span className={`text-[10px] font-black px-1.5 rounded-full ${activeCategory === cat.name ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
+                {cat.count > 0 ? cat.count : ''}
+              </span>
             </div>
           ))}
         </div>
@@ -139,153 +219,60 @@ export const RequirementList: React.FC<RequirementListProps> = ({ onRequirementC
       <div className="relative w-0 z-20">
          <button 
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="absolute top-1/2 -translate-y-1/2 -left-3 w-6 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-300 hover:text-blue-500 shadow-sm transition-all"
+          className="absolute top-1/2 -translate-y-1/2 -left-3 w-6 h-12 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-500 shadow-sm transition-all z-30"
          >
            <ChevronRight size={14} className={isSidebarOpen ? 'rotate-180' : ''} />
          </button>
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/30">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/10">
         <div className="px-4 py-3 bg-white flex items-center justify-between border-b border-slate-100 flex-shrink-0">
           <div className="flex items-center gap-2">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 transition-colors shadow-sm">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-bold flex items-center gap-1.5 transition-all shadow-md shadow-blue-100 active:scale-95">
               <Plus size={16} strokeWidth={2.5} />
-              创建
+              创建需求
             </button>
-            <button className="px-3 py-1.5 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-1">
-              更多操作
+            <button className="px-3 py-1.5 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-1 transition-colors">
+              批量处理
               <ChevronDown size={14} className="text-slate-400" />
             </button>
           </div>
-
-          <div className="flex items-center gap-6 text-slate-500 text-sm font-medium">
-            <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-800">
-              <Maximize2 size={14} className="opacity-70" />
-              <span>视图: 所有的</span>
-            </div>
-            <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-800">
-              <ListFilter size={14} className="opacity-70" />
-              <span>分组: 无分组</span>
-            </div>
-            <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-800">
+          <div className="flex items-center gap-6 text-slate-500 text-sm font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-800 transition-colors">
               <Filter size={14} className="opacity-70" />
-              <span>过滤</span>
+              <span className="text-xs">过滤</span>
             </div>
-            <div className="text-slate-400">
-              共 21 个
-            </div>
-            <button className="p-1 hover:bg-slate-100 rounded">
+            <div className="text-[11px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">TOTAL: 21</div>
+            <button className="p-1 hover:bg-slate-100 rounded transition-colors text-slate-400">
               <MoreHorizontal size={18} />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto bg-white">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-white border-b border-slate-100 sticky top-0 z-10 text-slate-400 text-sm font-bold">
+        <div className="flex-1 overflow-auto bg-white custom-scrollbar">
+          <table className="w-full text-left border-collapse table-fixed">
+            <thead className="bg-white border-b border-slate-200 sticky top-0 z-10 text-slate-400 text-[10px] font-black uppercase tracking-widest">
               <tr>
-                <th className="py-3 px-4 w-12 text-center"><input type="checkbox" className="rounded border-slate-300" /></th>
-                <th className="py-3 px-4 w-32">ID</th>
-                <th className="py-3 px-4 min-w-[400px]">标题 (21)</th>
-                <th className="py-3 px-4 w-32">优先级</th>
-                <th className="py-3 px-4 w-40">迭代</th>
-                <th className="py-3 px-4 w-32">状态</th>
+                {[
+                  { label: '', width: colWidths[0] },
+                  { label: 'ID', width: colWidths[1] },
+                  { label: '需求标题', width: colWidths[2] },
+                  { label: '优先级', width: colWidths[3] },
+                  { label: '所属迭代', width: colWidths[4] },
+                  { label: '当前状态', width: colWidths[5] }
+                ].map((col, i) => (
+                  <th key={i} className="py-3 px-4 relative group/th" style={{ width: col.width }}>
+                    {col.label}
+                    <div 
+                      onMouseDown={(e) => onMouseDown(i, e)}
+                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400 group-active/th:bg-blue-600 transition-colors z-20"
+                    />
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="text-sm">
-              <tr className="border-b border-slate-50">
-                 <td></td>
-                 <td></td>
-                 <td colSpan={4} className="py-2.5 px-10 text-slate-300 text-sm">
-                    <div className="flex items-center gap-2 cursor-pointer hover:text-blue-500 w-fit">
-                      <Plus size={14} /> 快速创建
-                    </div>
-                 </td>
-              </tr>
-              
-              {MOCK_REQUIREMENTS.map((req) => (
-                <React.Fragment key={req.id}>
-                  <tr 
-                    className="hover:bg-slate-50/80 transition-colors group cursor-pointer border-b border-slate-50"
-                    onClick={() => handleRowClick(req)}
-                  >
-                    <td className="py-3 px-4 text-center">
-                      <input type="checkbox" className="rounded border-slate-300" onClick={(e) => e.stopPropagation()} />
-                    </td>
-                    <td className="py-3 px-4 font-mono text-slate-500 font-bold">{req.id}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2" style={{ paddingLeft: `${req.level * 24}px` }}>
-                        {req.children ? (
-                           <ChevronRight size={14} className={`text-slate-400 transition-transform ${req.isExpanded ? 'rotate-90' : ''}`} />
-                        ) : (
-                          <div className="w-3.5" />
-                        )}
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold text-white leading-none ${req.type === 'EPIC' ? 'bg-purple-400' : 'bg-blue-500'}`}>
-                          {req.type}
-                        </span>
-                        <span className="text-slate-700 hover:text-blue-600 transition-colors truncate">
-                          {req.title}
-                        </span>
-                        {req.hasWarning && <AlertTriangle size={14} className="text-orange-400" />}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`px-3 py-1 rounded text-xs font-bold text-white min-w-[60px] inline-block text-center ${
-                        req.priority === Priority.High ? 'bg-red-400' : req.priority === Priority.Normal ? 'bg-emerald-500' : 'bg-slate-400'
-                      }`}>
-                        {req.priority}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-slate-400 truncate max-w-[120px]" title={req.iteration}>
-                      {req.iteration}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="px-3 py-1 rounded-full border border-emerald-500 text-emerald-500 text-xs font-bold">
-                        {req.status}
-                      </span>
-                    </td>
-                  </tr>
-
-                  {req.isExpanded && req.children?.map(child => (
-                    <tr 
-                      key={child.id} 
-                      className="hover:bg-slate-50/80 transition-colors group cursor-pointer border-b border-slate-50"
-                      onClick={() => handleRowClick(child)}
-                    >
-                      <td className="py-3 px-4 text-center">
-                        <input type="checkbox" className="rounded border-slate-300" onClick={(e) => e.stopPropagation()} />
-                      </td>
-                      <td className="py-3 px-4 font-mono text-slate-500 font-bold">{child.id}</td>
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2" style={{ paddingLeft: `${child.level * 24 + 14}px` }}>
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold text-white leading-none ${child.type === 'EPIC' ? 'bg-purple-400' : 'bg-blue-500'}`}>
-                            {child.type}
-                          </span>
-                          <span className="text-slate-700 hover:text-blue-600 transition-colors truncate">
-                            {child.title}
-                          </span>
-                          {child.hasWarning && <AlertTriangle size={14} className="text-orange-400" />}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className={`px-3 py-1 rounded text-xs font-bold text-white min-w-[60px] inline-block text-center ${
-                          child.priority === Priority.High ? 'bg-red-400' : child.priority === Priority.Normal ? 'bg-emerald-500' : 'bg-slate-400'
-                        }`}>
-                          {child.priority}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-slate-400 truncate max-w-[120px]">
-                        {child.iteration}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-3 py-1 rounded-full border border-emerald-500 text-emerald-500 text-xs font-bold">
-                          {child.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </React.Fragment>
-              ))}
+              {renderRequirements(MOCK_REQUIREMENTS)}
             </tbody>
           </table>
         </div>

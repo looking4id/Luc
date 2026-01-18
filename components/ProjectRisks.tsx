@@ -1,6 +1,9 @@
 
-import React from 'react';
-import { ShieldAlert, Search, Plus, MoreHorizontal } from './Icons';
+import React, { useState, useRef } from 'react';
+import { 
+  ShieldAlert, Search, Plus, MoreHorizontal, Filter, 
+  ChevronDown, ListFilter, Maximize2 
+} from './Icons';
 import { StatusBadge } from './ProjectShared';
 
 const MOCK_RISKS = [
@@ -10,71 +13,136 @@ const MOCK_RISKS = [
     { id: 'R-004', title: '竞品提前上线', probability: '中', impact: '中', status: '已识别', owner: 'pm01', strategy: '转移', created: '2025-07-12' },
 ];
 
-export const ProjectRisks = () => (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full">
-        <div className="p-4 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                <ShieldAlert size={20} className="text-red-500" /> 风险管理
-            </h3>
-            <div className="flex items-center gap-3">
-                <div className="relative">
-                    <input type="text" placeholder="搜索风险..." className="pl-8 pr-4 py-1.5 text-sm border border-slate-300 rounded focus:border-blue-500 outline-none w-64" />
-                    <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
-                <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm flex items-center gap-2">
-                    <Plus size={16} /> 登记风险
-                </button>
-            </div>
+export const ProjectRisks = () => {
+  // 列宽状态管理
+  const [colWidths, setColWidths] = useState([48, 300, 100, 100, 120, 100, 100, 80]);
+  const resizingRef = useRef<{ index: number; startX: number; startWidth: number } | null>(null);
+
+  const onMouseDown = (index: number, e: React.MouseEvent) => {
+    resizingRef.current = { index, startX: e.pageX, startWidth: colWidths[index] };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (!resizingRef.current) return;
+    const { index, startX, startWidth } = resizingRef.current;
+    const deltaX = e.pageX - startX;
+    const newWidths = [...colWidths];
+    newWidths[index] = Math.max(40, startWidth + deltaX);
+    setColWidths(newWidths);
+  };
+
+  const onMouseUp = () => {
+    resizingRef.current = null;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  };
+
+  const columns = ['选中', '风险标题', '可能性', '影响程度', '应对策略', '负责人', '状态', '操作'];
+
+  return (
+    <div className="flex flex-col h-full bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden font-sans">
+      {/* 工具栏：对齐 DefectList 风格 */}
+      <div className="px-4 py-3 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-medium flex items-center gap-1.5 shadow-sm transition-colors active:scale-95">
+            <Plus size={16} strokeWidth={2.5} /> 登记风险
+          </button>
+          <div className="relative">
+             <button className="px-3 py-1.5 border border-slate-200 rounded text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-1 transition-colors">
+               批量操作 <ChevronDown size={14} className="text-slate-400" />
+             </button>
+          </div>
         </div>
-        <div className="flex-1 overflow-auto">
-            <table className="w-full text-left">
-                <thead className="bg-slate-50 text-sm text-slate-500 font-semibold border-b border-slate-200">
-                    <tr>
-                        <th className="py-3 px-4 w-24">ID</th>
-                        <th className="py-3 px-4">风险标题</th>
-                        <th className="py-3 px-4 w-24">可能性</th>
-                        <th className="py-3 px-4 w-24">影响程度</th>
-                        <th className="py-3 px-4 w-32">应对策略</th>
-                        <th className="py-3 px-4 w-24">负责人</th>
-                        <th className="py-3 px-4 w-24">状态</th>
-                        <th className="py-3 px-4 w-24 text-right">操作</th>
+        <div className="flex items-center gap-6 text-slate-500 text-sm font-medium">
+          <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-800 transition-colors">
+            <Search size={14} /> <span>搜索</span>
+          </div>
+          <div className="flex items-center gap-1.5 cursor-pointer hover:text-slate-800 transition-colors">
+            <Filter size={14} /> <span>过滤</span>
+          </div>
+          <div className="text-slate-400">共 {MOCK_RISKS.length} 个</div>
+          <button className="p-1 hover:bg-slate-100 rounded transition-colors">
+            <MoreHorizontal size={18} />
+          </button>
+        </div>
+      </div>
+
+      {/* 表格区：对齐 DefectList 风格 */}
+      <div className="flex-1 overflow-auto">
+        <table className="w-full text-left border-collapse table-fixed">
+          <thead className="bg-white border-b border-slate-200 sticky top-0 z-10 text-slate-400 text-xs font-bold uppercase tracking-widest">
+            <tr>
+              {columns.map((col, i) => (
+                <th key={i} className="py-3 px-4 relative group/th truncate" style={{ width: colWidths[i] }}>
+                  {col === '选中' ? <input type="checkbox" className="rounded border-slate-300" /> : col}
+                  {i < columns.length - 1 && (
+                    <div 
+                      onMouseDown={(e) => onMouseDown(i, e)} 
+                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400 group-active/th:bg-blue-600 transition-colors z-20" 
+                    />
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="text-sm divide-y divide-slate-50">
+            {MOCK_RISKS.map(risk => {
+                const isCritical = risk.probability === '高' && risk.impact === '高';
+                return (
+                    <tr key={risk.id} className={`hover:bg-slate-50 transition-colors group cursor-pointer ${isCritical ? 'bg-red-50/40' : ''}`}>
+                        <td className="py-3 px-4"><input type="checkbox" className="rounded border-slate-300" onClick={(e) => e.stopPropagation()} /></td>
+                        <td className="py-3 px-4 truncate">
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-mono font-bold text-slate-400 bg-slate-100 px-1 rounded leading-none py-0.5">{risk.id}</span>
+                                    <span className="text-slate-700 font-semibold group-hover:text-blue-600 transition-colors truncate">{risk.title}</span>
+                                </div>
+                                <span className="text-[10px] text-slate-400 mt-0.5 ml-14">创建于 {risk.created}</span>
+                            </div>
+                        </td>
+                        <td className="py-3 px-4">
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                                risk.probability === '高' ? 'bg-red-50 text-red-600 border-red-100' :
+                                risk.probability === '中' ? 'bg-orange-50 text-orange-600 border-orange-100' : 
+                                'bg-green-50 text-green-600 border-green-100'
+                            }`}>{risk.probability}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                                risk.impact === '高' ? 'bg-red-50 text-red-600 border-red-100' :
+                                risk.impact === '中' ? 'bg-orange-50 text-orange-600 border-orange-100' : 
+                                'bg-green-50 text-green-600 border-green-100'
+                            }`}>{risk.impact}</span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 truncate">{risk.strategy}</td>
+                        <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">
+                                    {risk.owner.slice(0, 1).toUpperCase()}
+                                </div>
+                                <span className="text-slate-600 truncate font-medium">{risk.owner}</span>
+                            </div>
+                        </td>
+                        <td className="py-3 px-4"><StatusBadge status={risk.status} /></td>
+                        <td className="py-3 px-4 text-right">
+                             <div className="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-white rounded shadow-sm border border-transparent hover:border-slate-100">
+                                    <MoreHorizontal size={16} />
+                                </button>
+                             </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {MOCK_RISKS.map(risk => {
-                        const isCritical = risk.probability === '高' && risk.impact === '高';
-                        return (
-                            <tr key={risk.id} className={`border-b border-slate-100 hover:bg-slate-50 group ${isCritical ? 'bg-red-50/30' : ''}`}>
-                                <td className="py-3 px-4 text-xs font-mono text-slate-500">{risk.id}</td>
-                                <td className="py-3 px-4">
-                                    <div className="font-medium text-slate-700 group-hover:text-blue-600 cursor-pointer">{risk.title}</div>
-                                    <div className="text-xs text-slate-400 mt-1">创建于: {risk.created}</div>
-                                </td>
-                                <td className="py-3 px-4">
-                                    <span className={`text-xs px-2 py-0.5 rounded ${
-                                        risk.probability === '高' ? 'bg-red-100 text-red-700' :
-                                        risk.probability === '中' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
-                                    }`}>{risk.probability}</span>
-                                </td>
-                                <td className="py-3 px-4">
-                                    <span className={`text-xs px-2 py-0.5 rounded ${
-                                        risk.impact === '高' ? 'bg-red-100 text-red-700' :
-                                        risk.impact === '中' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
-                                    }`}>{risk.impact}</span>
-                                </td>
-                                <td className="py-3 px-4 text-sm text-slate-600">{risk.strategy}</td>
-                                <td className="py-3 px-4 text-sm text-slate-600">{risk.owner}</td>
-                                <td className="py-3 px-4"><StatusBadge status={risk.status} /></td>
-                                <td className="py-3 px-4 text-right">
-                                    <button className="p-1 text-slate-400 hover:text-slate-600">
-                                        <MoreHorizontal size={16} />
-                                    </button>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
-        </div>
+                );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
-);
+  );
+};

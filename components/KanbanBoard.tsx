@@ -4,286 +4,217 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import { MOCK_COLUMNS, MOCK_USERS, MOCK_PROJECTS } from '../constants';
 import { KanbanCard } from './KanbanCard';
 import { Circle, CheckCircle2, MoreHorizontal, Plus, XCircle, Clock, Trash2, ChevronDown, Paperclip, Download, UploadCloud, FileText, ChevronRight, LayoutList, FolderTree, PlayCircle } from './Icons';
-import { Task, TaskType, Priority, FilterState, Attachment, ViewType, Column } from '../types';
+import { Task, TaskType, Priority, FilterState, Attachment, ViewType, Column, User } from '../types';
 import { StatusBadge } from './ProjectShared';
 
-interface CreateTaskModalProps {
-  columnTitle?: string;
-  onClose: () => void;
-  onSubmit: (task: Task) => void;
-  defaultType?: TaskType | null;
-  defaultProjectId?: string;
-}
+// Added missing and exported CreateTaskModal component
+export const CreateTaskModal: React.FC<{
+    onClose: () => void;
+    onSubmit: (task: Task) => void;
+    defaultType: TaskType | null;
+    defaultProjectId?: string;
+}> = ({ onClose, onSubmit, defaultType, defaultProjectId }) => {
+    const [title, setTitle] = useState('');
+    const [type, setType] = useState<TaskType>(defaultType || TaskType.Task);
+    const [priority, setPriority] = useState<Priority>(Priority.Normal);
+    const [assigneeId, setAssigneeId] = useState('u1');
 
-export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ columnTitle, onClose, onSubmit, defaultType, defaultProjectId }) => {
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState<TaskType>(defaultType || TaskType.Task);
-  const [priority, setPriority] = useState<Priority>(Priority.Normal);
-  const [description, setDescription] = useState('');
-  const [projectId, setProjectId] = useState(defaultProjectId || MOCK_PROJECTS[0].id);
-  
-  useEffect(() => {
-    if (defaultType) setType(defaultType);
-  }, [defaultType]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) return;
-
-    const newTask: Task = {
-      id: `new-${Date.now()}`,
-      displayId: `#NEW${Math.floor(Math.random() * 1000)}`,
-      title,
-      type,
-      priority,
-      tags: ['新任务'],
-      dueDate: new Date().toISOString().split('T')[0],
-      assignee: MOCK_USERS[0],
-      statusColor: 'bg-blue-500',
-      description: description,
-      progress: 0,
-      projectId: projectId,
-      creatorId: 'u1',
-      attachments: []
+    const handleSumbit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const newTask: Task = {
+            id: `t${Date.now()}`,
+            displayId: `#${type === TaskType.Requirement ? 'RQ' : type === TaskType.Defect ? 'DF' : 'TS'}-${Math.floor(Math.random() * 1000)}`,
+            title,
+            type,
+            priority,
+            dueDate: new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0],
+            assignee: MOCK_USERS.find(u => u.id === assigneeId) || MOCK_USERS[0],
+            statusColor: type === TaskType.Defect ? 'bg-red-500' : 'bg-blue-600',
+            creatorId: 'u1',
+            projectId: defaultProjectId || 'p1'
+        };
+        onSubmit(newTask);
     };
 
-    onSubmit(newTask);
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg shadow-xl w-[500px] animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-4 border-b border-slate-100">
-          <h3 className="font-bold text-slate-800 text-sm">新建{type} {columnTitle ? `(${columnTitle})` : ''}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <XCircle size={20} />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">标题</label>
-            <input 
-              type="text" 
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="输入任务标题..."
-              autoFocus
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-               <label className="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">类型</label>
-               <select 
-                 value={type}
-                 onChange={(e) => setType(e.target.value as TaskType)}
-                 className="w-full border border-slate-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-500"
-               >
-                 {Object.values(TaskType).map(t => (
-                   <option key={t} value={t}>{t}</option>
-                 ))}
-               </select>
-            </div>
-            <div>
-               <label className="block text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">优先级</label>
-               <select 
-                 value={priority}
-                 onChange={(e) => setPriority(e.target.value as Priority)}
-                 className="w-full border border-slate-300 rounded px-3 py-2 text-sm outline-none focus:border-blue-500"
-               >
-                 {Object.values(Priority).map(p => (
-                   <option key={p} value={p}>{p}</option>
-                 ))}
-               </select>
-            </div>
-          </div>
-          <div className="flex justify-end pt-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded mr-2 transition-colors">取消</button>
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700 transition-colors shadow-sm">创建</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-interface TaskDetailsModalProps {
-  task: Task;
-  onClose: () => void;
-  onUpdate: (updatedTask: Task) => void;
-  onDelete: (taskId: string) => void;
-}
-
-export const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ task, onClose, onUpdate, onDelete }) => {
-  const [editedTask, setEditedTask] = useState<Task>({ ...task });
-  const [showSaveIndicator, setShowSaveIndicator] = useState(false);
-  
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0]) {
-          const file = e.target.files[0];
-          const newAttachment: Attachment = {
-              id: `att-${Date.now()}`,
-              name: file.name,
-              url: '#',
-              type: file.type,
-              size: file.size,
-              uploadedAt: new Date().toISOString()
-          };
-          const updated = { ...editedTask, attachments: [...(editedTask.attachments || []), newAttachment] };
-          setEditedTask(updated);
-          onUpdate(updated);
-      }
-  };
-
-  const handleChange = (field: keyof Task, value: any) => {
-      const updated = { ...editedTask, [field]: value };
-      setEditedTask(updated);
-      onUpdate(updated);
-  };
-
-  const getStatusName = (color: string) => {
-      if (color.includes('green')) return '已完成';
-      if (color.includes('red')) return '已逾期';
-      if (color.includes('gray')) return '未开始';
-      return '处理中';
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
-      <div className="bg-white rounded-lg shadow-2xl w-[800px] h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
-        <div className="h-14 border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0">
-          <div className="flex items-center gap-3">
-             <div className="text-xs text-slate-500 font-mono font-bold bg-slate-100 px-2 py-1 rounded">
-                {task.displayId}
-             </div>
-             {showSaveIndicator && (
-                 <span className="text-xs text-green-600 font-bold flex items-center gap-1 animate-in fade-in">
-                     <CheckCircle2 size={12} /> 已保存
-                 </span>
-             )}
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => { if(confirm('删除事项？')) onDelete(task.id); }} className="p-2 text-slate-400 hover:text-red-600 rounded transition-colors"><Trash2 size={18} /></button>
-            <div className="w-px h-6 bg-slate-200 mx-2"></div>
-            <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded transition-colors"><XCircle size={24} /></button>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-hidden flex">
-          <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-white">
-             <input 
-               type="text"
-               value={editedTask.title}
-               onChange={(e) => handleChange('title', e.target.value)}
-               className="text-xl font-bold text-slate-800 w-full mb-6 border-b border-transparent hover:border-slate-200 focus:border-blue-500 outline-none bg-transparent transition-colors pb-1"
-             />
-
-             <div className="mb-8">
-                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                     <FileText size={14} className="text-slate-400" /> 描述
-                 </h4>
-                 <textarea 
-                    value={editedTask.description || ''}
-                    onChange={(e) => handleChange('description', e.target.value)}
-                    className="w-full min-h-[120px] p-4 text-sm text-slate-700 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y transition-all"
-                    placeholder="添加描述..."
-                 />
-             </div>
-
-             <div className="mb-8">
-                 <div className="flex items-center justify-between mb-3">
-                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                         <Paperclip size={14} className="text-slate-400" /> 附件 ({editedTask.attachments?.length || 0})
-                     </h4>
-                     <label className="cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">
-                         <UploadCloud size={14} /> 上传文件
-                         <input type="file" className="hidden" onChange={handleFileUpload} />
-                     </label>
-                 </div>
-                 {(!editedTask.attachments || editedTask.attachments.length === 0) && (
-                     <div className="border border-dashed border-slate-200 rounded-xl p-6 text-center text-xs text-slate-400 font-medium">
-                         暂无附件
-                     </div>
-                 )}
-             </div>
-          </div>
-
-          <div className="w-72 bg-slate-50 border-l border-slate-200 p-6 overflow-y-auto">
-              <div className="space-y-6">
-                  <SidebarSection label="当前状态">
-                    <div className="relative group cursor-pointer shadow-sm rounded-xl overflow-hidden border border-slate-200 hover:border-blue-400 transition-all bg-white">
-                        <StatusBadge status={getStatusName(editedTask.statusColor)} className="px-4 py-2 text-xs border-none w-full justify-between" />
-                        <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+    return (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[100] flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-in zoom-in-95 duration-200">
+                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 className="font-bold text-slate-800 text-lg">新建工作项</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><XCircle size={24} /></button>
+                </div>
+                <form onSubmit={handleSumbit} className="p-6 space-y-4">
+                    <div>
+                        <label className="block text-xs font-bold text-slate-400 uppercase mb-1">标题</label>
+                        <input 
+                            required 
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500" 
+                            value={title} 
+                            onChange={e => setTitle(e.target.value)}
+                        />
                     </div>
-                  </SidebarSection>
-
-                  <SidebarSection label="负责人">
-                    <select value={editedTask.assignee?.id || ''} onChange={(e) => handleChange('assignee', MOCK_USERS.find(u => u.id === e.target.value))} className="w-full appearance-none bg-white border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-4 py-2 focus:border-blue-500 outline-none cursor-pointer hover:border-slate-300 shadow-sm transition-all">
-                        {MOCK_USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                    </select>
-                  </SidebarSection>
-
-                  <SidebarSection label="优先级">
-                    <select value={editedTask.priority} onChange={(e) => handleChange('priority', e.target.value)} className="w-full appearance-none bg-white border border-slate-200 text-xs font-bold text-slate-700 rounded-xl px-4 py-2 focus:border-blue-500 outline-none cursor-pointer hover:border-slate-300 shadow-sm transition-all">
-                        {Object.values(Priority).map(p => <option key={p} value={p}>{p}</option>)}
-                    </select>
-                  </SidebarSection>
-
-                  <SidebarSection label="截止日期">
-                    <input type="date" value={editedTask.dueDate} onChange={(e) => handleChange('dueDate', e.target.value)} className="w-full bg-white border border-slate-200 text-xs font-mono font-bold text-slate-700 rounded-xl px-4 py-2 focus:border-blue-500 outline-none hover:border-slate-300 shadow-sm transition-all" />
-                  </SidebarSection>
-
-                  <SidebarSection label="完成进度">
-                      <div className="flex items-center gap-3">
-                        <input type="range" min="0" max="100" value={editedTask.progress || 0} onChange={(e) => handleChange('progress', parseInt(e.target.value))} className="flex-1 h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-blue-600" />
-                        <span className="text-xs font-bold text-blue-600 w-8">{editedTask.progress}%</span>
-                      </div>
-                  </SidebarSection>
-              </div>
-          </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase mb-1">类型</label>
+                            <select className="w-full border border-slate-200 rounded-lg px-3 py-2" value={type} onChange={e => setType(e.target.value as TaskType)}>
+                                {Object.values(TaskType).map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-400 uppercase mb-1">优先级</label>
+                            <select className="w-full border border-slate-200 rounded-lg px-3 py-2" value={priority} onChange={e => setPriority(e.target.value as Priority)}>
+                                {Object.values(Priority).map(p => <option key={p} value={p}>{p}</option>)}
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-slate-400 uppercase mb-1">负责人</label>
+                        <select className="w-full border border-slate-200 rounded-lg px-3 py-2" value={assigneeId} onChange={e => setAssigneeId(e.target.value)}>
+                            {MOCK_USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                        </select>
+                    </div>
+                    <div className="pt-4 flex gap-3">
+                        <button type="button" onClick={onClose} className="flex-1 py-2 border border-slate-200 rounded-lg text-slate-600 font-bold hover:bg-slate-50">取消</button>
+                        <button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700">创建</button>
+                    </div>
+                </form>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
-const SidebarSection = ({ label, children }: any) => (
-    <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-[0.1em] ml-1">{label}</label>
-        {children}
-    </div>
-);
+// Added missing and exported TaskDetailsModal component
+export const TaskDetailsModal: React.FC<{
+    task: Task;
+    onClose: () => void;
+    onUpdate: (task: Task) => void;
+    onDelete: (id: string) => void;
+}> = ({ task, onClose, onUpdate, onDelete }) => {
+    const [title, setTitle] = useState(task.title);
+
+    return (
+        <div className="fixed inset-0 bg-slate-900/10 z-[100] flex items-center justify-end">
+            <div 
+                className="fixed inset-0 cursor-default" 
+                onClick={onClose}
+            ></div>
+            <div className="bg-white w-[640px] h-full shadow-[-12px_0_40px_rgba(0,0,0,0.08)] flex flex-col animate-in slide-in-from-right duration-300 relative z-10">
+                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="text-xs font-mono font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded">{task.displayId}</span>
+                        <h3 className="font-bold text-slate-800">工作项详情</h3>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => onDelete(task.id)} className="p-2 text-slate-400 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
+                        <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 transition-colors"><XCircle size={24} /></button>
+                    </div>
+                </div>
+                <div className="flex-1 overflow-auto p-8 space-y-8 custom-scrollbar">
+                    <div>
+                        <input 
+                            className="text-2xl font-bold text-slate-800 w-full outline-none border-b border-transparent focus:border-blue-200 pb-2 transition-all"
+                            value={title}
+                            onChange={e => setTitle(e.target.value)}
+                            onBlur={() => onUpdate({ ...task, title })}
+                        />
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-6">
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">类型</span>
+                            <div className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${task.type === TaskType.Requirement ? 'bg-blue-500' : task.type === TaskType.Defect ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                                {task.type}
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">优先级</span>
+                            <div className="text-sm font-bold text-slate-700">{task.priority}</div>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">负责人</span>
+                            <div className="flex items-center gap-2">
+                                <div className={`w-6 h-6 rounded-full ${task.assignee.avatarColor} text-white flex items-center justify-center text-[10px] font-bold shadow-sm`}>{task.assignee.name.charAt(0)}</div>
+                                <span className="text-sm font-bold text-slate-700">{task.assignee.name}</span>
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">截止日期</span>
+                            <div className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                <Clock size={14} className="text-slate-400" />
+                                {task.dueDate}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="space-y-2 pt-4 border-t border-slate-50">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">详细描述</span>
+                        <div className="text-sm text-slate-600 bg-slate-50/50 p-5 rounded-2xl min-h-[160px] leading-relaxed border border-slate-100">
+                            {task.description || '暂无描述内容'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const TaskListView: React.FC<{ tasks: Task[], onTaskClick: (t: Task) => void }> = ({ tasks, onTaskClick }) => {
+    const [colWidths, setColWidths] = useState([80, 400, 100, 100, 120, 100]);
+    const resizingRef = useRef<{ index: number; startX: number; startWidth: number } | null>(null);
+
+    const onMouseDown = (index: number, e: React.MouseEvent) => {
+        resizingRef.current = { index, startX: e.pageX, startWidth: colWidths[index] };
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = 'col-resize';
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+        if (!resizingRef.current) return;
+        const { index, startX, startWidth } = resizingRef.current;
+        const deltaX = e.pageX - startX;
+        const newWidths = [...colWidths];
+        newWidths[index] = Math.max(40, startWidth + deltaX);
+        setColWidths(newWidths);
+    };
+
+    const onMouseUp = () => {
+        resizingRef.current = null;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = 'default';
+    };
+
+    const columns = ['ID', '标题', '状态', '优先级', '负责人', '截止日期'];
+
     return (
         <div className="flex-1 overflow-auto bg-white p-4">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse table-fixed">
                 <thead>
-                    <tr className="border-b border-slate-200 text-slate-400 text-xs font-bold uppercase">
-                        <th className="py-3 px-4 w-24">ID</th>
-                        <th className="py-3 px-4">标题</th>
-                        <th className="py-3 px-4 w-32">状态</th>
-                        <th className="py-3 px-4 w-24 text-center">优先级</th>
-                        <th className="py-3 px-4 w-32">负责人</th>
-                        <th className="py-3 px-4 w-32 text-right">截止日期</th>
+                    <tr className="border-b border-slate-200 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                        {columns.map((col, i) => (
+                            <th key={i} className="py-3 px-4 relative group/th truncate" style={{ width: colWidths[i] }}>
+                                {col}
+                                <div onMouseDown={(e) => onMouseDown(i, e)} className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400 z-20" />
+                            </th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody className="text-sm">
                     {tasks.map(task => (
                         <tr key={task.id} onClick={() => onTaskClick(task)} className="border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors group">
-                            <td className="py-4 px-4 text-xs font-mono font-bold text-slate-400">{task.displayId}</td>
-                            <td className="py-4 px-4 font-semibold text-slate-700 group-hover:text-blue-600">{task.title}</td>
+                            <td className="py-4 px-4 text-xs font-mono font-bold text-slate-400 truncate">{task.displayId}</td>
+                            <td className="py-4 px-4 font-semibold text-slate-700 group-hover:text-blue-600 truncate">{task.title}</td>
                             <td className="py-4 px-4"><StatusBadge status={task.statusColor.includes('green') ? '已完成' : '进行中'} /></td>
                             <td className="py-4 px-4 text-center">
-                                <span className={`text-xs font-bold px-2 py-0.5 rounded border ${task.priority === Priority.High ? 'bg-red-50 text-red-600 border-red-100' : 'bg-slate-50 text-slate-500'}`}>{task.priority || '低'}</span>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${task.priority === Priority.High ? 'bg-red-50 text-red-600 border-red-100' : 'bg-slate-50 text-slate-500'}`}>{task.priority || '低'}</span>
                             </td>
                             <td className="py-4 px-4">
-                                <div className="flex items-center gap-2">
-                                     <div className={`w-5 h-5 rounded-full ${task.assignee?.avatarColor} text-white flex items-center justify-center text-[10px] font-bold shadow-sm`}>{task.assignee?.name.slice(0, 1)}</div>
-                                     <span className="text-xs font-medium">{task.assignee?.name}</span>
+                                <div className="flex items-center gap-2 truncate">
+                                     <div className={`w-5 h-5 rounded-full ${task.assignee?.avatarColor} text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0`}>{task.assignee?.name.slice(0, 1)}</div>
+                                     <span className="text-xs font-medium truncate">{task.assignee?.name}</span>
                                 </div>
                             </td>
-                            <td className="py-4 px-4 text-xs font-mono text-slate-400 text-right">{task.dueDate}</td>
+                            <td className="py-4 px-4 text-xs font-mono text-slate-400 truncate">{task.dueDate}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -292,144 +223,156 @@ const TaskListView: React.FC<{ tasks: Task[], onTaskClick: (t: Task) => void }> 
     );
 };
 
+// Added missing TaskTreeView component
 const TaskTreeView: React.FC<{ tasks: Task[], onTaskClick: (t: Task) => void }> = ({ tasks, onTaskClick }) => {
-    const groupedTasks = useMemo(() => {
-        const groups: Record<string, Task[]> = {};
-        tasks.forEach(task => {
-            const key = task.type;
-            if (!groups[key]) groups[key] = [];
-            groups[key].push(task);
-        });
-        return groups;
-    }, [tasks]);
-
-    const [expanded, setExpanded] = useState<Record<string, boolean>>(Object.keys(groupedTasks).reduce((acc, key) => ({...acc, [key]: true}), {}));
-
     return (
-        <div className="flex-1 overflow-auto bg-white p-6">
-             {Object.entries(groupedTasks).map(([type, groupTasks]) => (
-                 <div key={type} className="mb-6">
-                     <div onClick={() => setExpanded(prev => ({...prev, [type]: !prev[type]}))} className="flex items-center gap-2 py-2 cursor-pointer group">
-                         <ChevronRight size={14} className={`text-slate-300 transition-transform ${expanded[type] ? 'rotate-90' : ''}`} />
-                         <span className="font-bold text-slate-800 text-sm uppercase tracking-wider">{type}</span>
-                         <span className="text-xs font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">{(groupTasks as Task[]).length}</span>
-                     </div>
-                     {expanded[type] && (
-                         <div className="ml-5 border-l border-slate-100 pl-4 mt-2 space-y-1">
-                             {(groupTasks as Task[]).map(task => (
-                                 <div key={task.id} onClick={() => onTaskClick(task)} className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 cursor-pointer group transition-all">
-                                     <div className="flex items-center gap-3">
-                                         <div className={`w-1.5 h-1.5 rounded-full ${task.statusColor}`}></div>
-                                         <span className="text-sm font-medium text-slate-700 group-hover:text-blue-600">{task.title}</span>
-                                     </div>
-                                     <span className="text-xs font-mono font-bold text-slate-300">{task.displayId}</span>
-                                 </div>
-                             ))}
-                         </div>
-                     )}
-                 </div>
-             ))}
+        <div className="flex-1 overflow-auto bg-white p-4">
+            <div className="space-y-1">
+                {tasks.map(task => (
+                    <div key={task.id} onClick={() => onTaskClick(task)} className="flex items-center gap-4 py-3 px-4 border border-transparent hover:border-blue-100 hover:bg-blue-50/30 rounded-xl cursor-pointer transition-all">
+                        <ChevronRight size={14} className="text-slate-300" />
+                        <span className="text-xs font-mono text-slate-400 w-20">{task.displayId}</span>
+                        <span className="text-sm font-bold text-slate-700 truncate flex-1">{task.title}</span>
+                        <StatusBadge status={task.statusColor.includes('green') ? '已完成' : '进行中'} />
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
 
-interface KanbanBoardProps {
-  filters: FilterState;
-  viewType: ViewType;
-  isCreateModalOpen: boolean;
-  setIsCreateModalOpen: (isOpen: boolean) => void;
-  createModalType: TaskType | null;
-  setCreateModalType: (type: TaskType | null) => void;
-}
+// Added missing and exported KanbanBoard component
+export const KanbanBoard: React.FC<{
+    filters: FilterState;
+    viewType: ViewType;
+    isCreateModalOpen: boolean;
+    setIsCreateModalOpen: (open: boolean) => void;
+    createModalType: TaskType | null;
+    setCreateModalType: (type: TaskType | null) => void;
+}> = ({ filters, viewType, isCreateModalOpen, setIsCreateModalOpen, createModalType, setCreateModalType }) => {
+    const [columns, setColumns] = useState<Column[]>(MOCK_COLUMNS);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ 
-    filters, viewType, isCreateModalOpen, setIsCreateModalOpen, createModalType, setCreateModalType
-}) => {
-  const [columns, setColumns] = useState<Column[]>(MOCK_COLUMNS);
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const filteredColumns = useMemo(() => {
+        return columns.map(col => ({
+            ...col,
+            tasks: col.tasks.filter(task => {
+                if (filters.search && !task.title.toLowerCase().includes(filters.search.toLowerCase()) && !task.displayId.toLowerCase().includes(filters.search.toLowerCase())) return false;
+                if (filters.type && task.type !== filters.type) return false;
+                if (filters.priority && task.priority !== filters.priority) return false;
+                if (filters.projectId && task.projectId !== filters.projectId) return false;
+                if (filters.assigneeId && task.assignee?.id !== filters.assigneeId) return false;
+                if (filters.creatorId && task.creatorId !== filters.creatorId) return false;
+                if (filters.status && col.title !== filters.status) return false;
+                return true;
+            })
+        }));
+    }, [columns, filters]);
 
-  const isTaskVisible = (task: Task) => {
-    if (filters.search) {
-      const s = filters.search.toLowerCase();
-      if (!task.title.toLowerCase().includes(s) && !task.displayId.toLowerCase().includes(s)) return false;
-    }
-    if (filters.assigneeId && task.assignee?.id !== filters.assigneeId) return false;
-    if (filters.type && task.type !== filters.type) return false;
-    if (filters.priority && task.priority !== filters.priority) return false;
-    return true;
-  };
+    const onDragEnd = (result: DropResult) => {
+        const { source, destination } = result;
+        if (!destination) return;
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-  const filteredColumns = useMemo(() => {
-    return columns.map(col => ({ ...col, tasks: col.tasks.filter(isTaskVisible) }));
-  }, [columns, filters]);
+        const newColumns = [...columns];
+        const sourceCol = newColumns.find(c => c.id === source.droppableId)!;
+        const destCol = newColumns.find(c => c.id === destination.droppableId)!;
+        
+        const [movedTask] = sourceCol.tasks.splice(source.index, 1);
+        destCol.tasks.splice(destination.index, 0, movedTask);
+        
+        setColumns(newColumns);
+    };
 
-  const allFilteredTasks = useMemo(() => filteredColumns.flatMap(col => col.tasks), [filteredColumns]);
+    const handleCreateTask = (task: Task) => {
+        const newColumns = [...columns];
+        newColumns[0].tasks.unshift(task);
+        setColumns(newColumns);
+        setIsCreateModalOpen(false);
+    };
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
-    const { source, destination } = result;
-    if (source.droppableId === destination.droppableId) {
-      const col = columns.find(c => c.id === source.droppableId);
-      if (!col) return;
-      const tasks = Array.from(col.tasks);
-      const [removed] = tasks.splice(source.index, 1);
-      tasks.splice(destination.index, 0, removed);
-      setColumns(columns.map(c => c.id === source.droppableId ? { ...c, tasks } : c));
-    } else {
-      const sCol = columns.find(c => c.id === source.droppableId);
-      const dCol = columns.find(c => c.id === destination.droppableId);
-      if (!sCol || !dCol) return;
-      const sTasks = Array.from(sCol.tasks);
-      const dTasks = Array.from(dCol.tasks);
-      const [removed] = sTasks.splice(source.index, 1);
-      dTasks.splice(destination.index, 0, removed);
-      setColumns(columns.map(c => {
-        if (c.id === source.droppableId) return { ...c, tasks: sTasks };
-        if (c.id === destination.droppableId) return { ...c, tasks: dTasks };
-        return c;
-      }));
-    }
-  };
+    const handleUpdateTask = (updatedTask: Task) => {
+        const newColumns = columns.map(col => ({
+            ...col,
+            tasks: col.tasks.map(t => t.id === updatedTask.id ? updatedTask : t)
+        }));
+        setColumns(newColumns);
+    };
 
-  if (viewType === 'list') return <TaskListView tasks={allFilteredTasks} onTaskClick={setSelectedTask} />;
-  if (viewType === 'tree') return <TaskTreeView tasks={allFilteredTasks} onTaskClick={setSelectedTask} />;
+    const handleDeleteTask = (id: string) => {
+        const newColumns = columns.map(col => ({
+            ...col,
+            tasks: col.tasks.filter(t => t.id !== id)
+        }));
+        setColumns(newColumns);
+        setSelectedTask(null);
+    };
 
-  return (
-    <div className="flex-1 overflow-x-auto overflow-y-hidden bg-slate-50 p-6 kanban-scroll relative">
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex items-start h-full gap-4 min-w-max">
-          {filteredColumns.map(column => (
-            <div key={column.id} className="w-80 flex-shrink-0 flex flex-col h-full bg-slate-100/50 rounded-xl border border-slate-200">
-              <div className="p-4 flex items-center justify-between flex-shrink-0">
-                <div className="flex items-center gap-2">
-                  <Circle size={10} className={column.iconColor} fill="currentColor" />
-                  <span className="font-bold text-slate-800 text-sm uppercase tracking-wider">{column.title}</span>
-                  <span className="bg-white border border-slate-200 text-slate-400 text-xs font-bold px-1.5 py-0.5 rounded-full">{column.tasks.length}</span>
-                </div>
-                <button onClick={() => { setActiveColumnId(column.id); setIsCreateModalOpen(true); }} className="p-1 text-slate-400 hover:text-blue-500 rounded transition-all"><Plus size={16} /></button>
-              </div>
-              <Droppable droppableId={column.id}>
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef} className="flex-1 overflow-y-auto px-2 pb-4 custom-scrollbar">
-                    {column.tasks.map((task, idx) => (
-                      <Draggable key={task.id} draggableId={task.id} index={idx}>
-                        {(p) => (
-                          <div ref={p.innerRef} {...p.draggableProps} {...p.dragHandleProps} style={p.draggableProps.style}>
-                             <KanbanCard task={task} onClick={setSelectedTask} onUpdate={setSelectedTask} />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </div>
-          ))}
+    return (
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/30">
+            {viewType === 'kanban' ? (
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <div className="flex-1 flex gap-4 overflow-x-auto p-4 custom-scrollbar">
+                        {filteredColumns.map(column => (
+                            <Droppable key={column.id} droppableId={column.id}>
+                                {(provided) => (
+                                    <div 
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                        className="w-80 flex-shrink-0 flex flex-col bg-slate-100/50 rounded-2xl border border-slate-200/60 h-full"
+                                    >
+                                        <div className="p-4 flex items-center justify-between border-b border-slate-200/30 mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <Circle size={8} className={column.iconColor} fill="currentColor" />
+                                                <span className="font-bold text-slate-700 text-sm">{column.title}</span>
+                                                <span className="text-xs text-slate-400 font-bold ml-1">{column.tasks.length}</span>
+                                            </div>
+                                            <button className="text-slate-400 hover:text-slate-600 transition-colors"><MoreHorizontal size={14}/></button>
+                                        </div>
+                                        <div className="flex-1 overflow-y-auto px-2 custom-scrollbar">
+                                            {column.tasks.map((task, index) => (
+                                                <Draggable key={task.id} draggableId={task.id} index={index}>
+                                                    {(provided) => (
+                                                        <div
+                                                            ref={provided.innerRef}
+                                                            {...provided.draggableProps}
+                                                            {...provided.dragHandleProps}
+                                                        >
+                                                            <KanbanCard task={task} onClick={setSelectedTask} onUpdate={handleUpdateTask} />
+                                                        </div>
+                                                    )}
+                                                </Draggable>
+                                            ))}
+                                            {provided.placeholder}
+                                        </div>
+                                    </div>
+                                )}
+                            </Droppable>
+                        ))}
+                    </div>
+                </DragDropContext>
+            ) : viewType === 'list' ? (
+                <TaskListView tasks={filteredColumns.flatMap(c => c.tasks)} onTaskClick={setSelectedTask} />
+            ) : (
+                <TaskTreeView tasks={filteredColumns.flatMap(c => c.tasks)} onTaskClick={setSelectedTask} />
+            )}
+
+            {isCreateModalOpen && (
+                <CreateTaskModal 
+                    onClose={() => setIsCreateModalOpen(false)} 
+                    onSubmit={handleCreateTask} 
+                    defaultType={createModalType} 
+                />
+            )}
+
+            {selectedTask && (
+                <TaskDetailsModal 
+                    task={selectedTask} 
+                    onClose={() => setSelectedTask(null)} 
+                    onUpdate={handleUpdateTask} 
+                    onDelete={handleDeleteTask} 
+                />
+            )}
         </div>
-      </DragDropContext>
-      {selectedTask && <TaskDetailsModal task={selectedTask} onClose={() => setSelectedTask(null)} onUpdate={setSelectedTask} onDelete={() => setSelectedTask(null)} />}
-    </div>
-  );
+    );
 };
