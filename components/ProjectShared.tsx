@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Priority } from '../types';
+import { Priority, Severity } from '../types';
 import { Circle, PlayCircle, CheckCircle2, XCircle, Clock, AlertTriangle } from './Icons';
 
 export const DonutChart = ({ percentage, color, label }: { percentage: number; color: string; label: string }) => {
@@ -97,4 +97,20 @@ export const PriorityBadge = ({ priority }: { priority?: Priority }) => {
       <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
       低
     </span>;
+};
+
+export const SeverityBadge = ({ severity }: { severity?: Severity }) => {
+    const baseClass = "inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded uppercase font-black tracking-tight";
+    switch (severity) {
+        case Severity.Critical:
+            return <span className={`${baseClass} bg-red-600 text-white shadow-sm shadow-red-200 animate-pulse`}>致命</span>;
+        case Severity.Major:
+            return <span className={`${baseClass} bg-orange-500 text-white shadow-sm shadow-orange-100`}>严重</span>;
+        case Severity.Normal:
+            return <span className={`${baseClass} bg-blue-500 text-white shadow-sm shadow-blue-100`}>一般</span>;
+        case Severity.Minor:
+            return <span className={`${baseClass} bg-slate-100 text-slate-400 border border-slate-200`}>提示</span>;
+        default:
+            return <span className={`${baseClass} bg-slate-50 text-slate-400`}>-</span>;
+    }
 };

@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import {
   LayoutGrid, ClipboardList, Code2, BookOpen, Users, BarChart2, Settings, 
-  ChevronDown, GLogo, ListFilter, Plus, ChevronLeft, ChevronRight, Search
+  ChevronDown, GLogo, ListFilter, Plus, ChevronLeft, ChevronRight, Search,
+  Briefcase
 } from './Icons';
 import { SavedView } from '../types';
 
@@ -16,7 +17,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
 
   const menuItems = [
     { icon: LayoutGrid, label: '工作台' },
-    { icon: BookOpen, label: '项目' },
+    { icon: Briefcase, label: '项目' },
     { icon: ClipboardList, label: '工作项' },
     { icon: Code2, label: '代码' },
     { icon: BookOpen, label: '知识库' },

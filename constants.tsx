@@ -1,5 +1,5 @@
 
-import { Column, Priority, TaskType, User, Project } from './types';
+import { Column, Priority, Severity, TaskType, User, Project } from './types';
 
 const user1: User = { id: 'u1', name: 'lo', avatarColor: 'bg-yellow-500' };
 const user2: User = { id: 'u2', name: 'Dev 1', avatarColor: 'bg-blue-500' };
@@ -72,6 +72,9 @@ export const MOCK_COLUMNS: Column[] = [
         title: '【缺陷】结算页面在iOS 15系统下样式错乱',
         type: TaskType.Defect,
         priority: Priority.High,
+        severity: Severity.Critical,
+        environment: '测试环境',
+        reproductionRate: '必然重现',
         tags: ['兼容性'],
         dueDate: '2025-08-16',
         assignee: user2,
@@ -123,6 +126,9 @@ export const MOCK_COLUMNS: Column[] = [
         title: '【缺陷】图片上传超过5MB时无错误提示',
         type: TaskType.Defect,
         priority: Priority.Normal,
+        severity: Severity.Major,
+        environment: '开发环境',
+        reproductionRate: '必然重现',
         tags: ['UI反馈'],
         dueDate: '2025-08-18',
         assignee: user2,
@@ -174,6 +180,9 @@ export const MOCK_COLUMNS: Column[] = [
         title: '【缺陷】首页Banner在某些分辨率下显示模糊',
         type: TaskType.Defect,
         priority: Priority.Normal,
+        severity: Severity.Normal,
+        environment: '线上环境',
+        reproductionRate: '间歇重现',
         tags: ['视觉体验'],
         dueDate: '2025-08-12',
         assignee: user5,
@@ -230,6 +239,9 @@ export const MOCK_COLUMNS: Column[] = [
         title: '【缺陷】IE 11兼容性问题 (已放弃支持)',
         type: TaskType.Defect,
         priority: Priority.Low,
+        severity: Severity.Minor,
+        environment: '测试环境',
+        reproductionRate: '难以重现',
         tags: ['兼容性'],
         dueDate: '2025-07-01',
         assignee: user2,

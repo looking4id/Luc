@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, ChevronDown, ListFilter, ArrowUpDown, Maximize2, MoreHorizontal, Plus, Calendar, XCircle, CheckCircle2, LayoutGrid, LayoutList, FolderTree } from './Icons';
+import { Search, ChevronDown, ListFilter, ArrowUpDown, Plus, Calendar, XCircle, CheckCircle2, LayoutGrid, LayoutList, FolderTree } from './Icons';
 import { MOCK_USERS, MOCK_PROJECTS, MOCK_COLUMNS } from '../constants';
 import { TaskType, Priority, FilterState, ViewType } from '../types';
 
@@ -397,12 +397,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, viewT
          <div className="w-px h-4 bg-slate-200"></div>
          <div className="px-2 py-1 hover:bg-slate-100 rounded cursor-pointer" title="排序">
              <ArrowUpDown size={16} />
-         </div>
-         <div className="px-2 py-1 hover:bg-slate-100 rounded cursor-pointer" title="全屏">
-             <Maximize2 size={16} />
-         </div>
-         <div className="px-2 py-1 hover:bg-slate-100 rounded cursor-pointer">
-             <MoreHorizontal size={16} />
          </div>
          
          {/* New Button with Dropdown */}

@@ -5,6 +5,13 @@ export enum Priority {
   Low = '低'
 }
 
+export enum Severity {
+  Critical = '致命',
+  Major = '严重',
+  Normal = '一般',
+  Minor = '提示'
+}
+
 export enum TaskType {
   Task = '任务',
   Requirement = '需求',
@@ -46,6 +53,9 @@ export interface Task {
   title: string;
   type: TaskType;
   priority?: Priority;
+  severity?: Severity; // 新增：严重程度
+  environment?: string; // 新增：发现环境
+  reproductionRate?: string; // 新增：重现率
   tags?: string[];
   dueDate: string;
   assignee: User;
@@ -55,6 +65,19 @@ export interface Task {
   projectId?: string;
   attachments?: Attachment[];
   creatorId: string;
+}
+
+// 新增：风险实体接口
+export interface Risk {
+  id: string;
+  title: string;
+  probability: '高' | '中' | '低';
+  impact: '高' | '中' | '低';
+  status: string;
+  owner: string;
+  strategy: string;
+  created: string;
+  description?: string;
 }
 
 export interface Column {
