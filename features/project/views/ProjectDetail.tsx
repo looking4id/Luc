@@ -19,7 +19,8 @@ import { ProjectCodeReview } from '../../../components/ProjectCodeReview';
 import { ProjectPipeline } from '../../../components/ProjectPipeline';
 import { ProjectMilestones } from '../../../components/ProjectMilestones';
 import { ProjectRisks } from '../../../components/ProjectRisks';
-import { ProjectMetrics } from '../../../components/ProjectMetrics';
+// 替换为全功能效能度量组件
+import { PerformanceMetrics } from '../../../components/PerformanceMetrics';
 import { ProjectMembers } from '../../../components/ProjectMembers';
 import { ProjectSettings } from '../../../components/ProjectSettings';
 import { ProjectVersions } from '../../../components/ProjectVersions';
@@ -124,6 +125,9 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
   const hiddenItems = menuItems.slice(visibleCount);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
+  // 判断是否为需要“全屏沉浸”的页面（即自带导航和复杂布局的页面）
+  const isFullPageTab = activeTab === '效能度量';
+
   const renderContent = () => {
     switch (activeTab) {
         case '项目概览': return <ProjectOverview project={project} onIterationClick={() => setActiveTab('迭代')} />;
@@ -138,7 +142,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
         case '风险': return <ProjectRisks />;
         case '代码评审': return <ProjectCodeReview />;
         case '流水线': return <ProjectPipeline />;
-        case '效能度量': return <ProjectMetrics />;
+        // 使用系统级效能度量组件，透传全局属性
+        case '效能度量': return <PerformanceMetrics user={user} onLogout={onLogout} onGoHome={onGoHome} />;
         case '成员': return <ProjectMembers />;
         case '项目设置': return <ProjectSettings project={project} />;
         default: return (
@@ -217,7 +222,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
          <GlobalRightControls user={user} onLogout={onLogout} onGoHome={onGoHome} />
       </div>
       <div className="flex-1 overflow-hidden relative bg-slate-50/50 dark:bg-slate-900/50 transition-colors">
-         <div className="h-full overflow-y-auto p-6 custom-scrollbar">{renderContent()}</div>
+         {/* 如果是全屏 Tab（如效能度量），移除 p-6 容器，允许组件自适应全屏 */}
+         <div className={`h-full overflow-y-auto custom-scrollbar ${isFullPageTab ? 'p-0' : 'p-6'}`}>{renderContent()}</div>
       </div>
       {isCreateModalOpen && <CreateTaskModal onClose={() => setIsCreateModalOpen(false)} onSubmit={handleCreateTask} defaultType={createTaskType} defaultProjectId={project.id} />}
       {editingTask && <TaskDetailsModal task={editingTask} onClose={() => setEditingTask(null)} onUpdate={handleUpdateTask} onDelete={handleDeleteTask} />}

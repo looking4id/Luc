@@ -407,8 +407,7 @@ export const ProjectRisks = () => {
                             return (
                                 <tr 
                                     key={risk.id} 
-                                    className={`hover:bg-red-50/10 transition-all group cursor-pointer ${isSelected ? 'bg-blue-50/40 shadow-inner' : isHighRisk ? 'bg-red-50/20' : ''}`}
-                                    onClick={() => toggleSelectItem(risk.id)}
+                                    className={`hover:bg-red-50/10 transition-all group ${isSelected ? 'bg-blue-50/40 shadow-inner' : isHighRisk ? 'bg-red-50/20' : ''}`}
                                 >
                                     <td className="py-5 px-4" onClick={(e) => e.stopPropagation()}>
                                         <div className="flex items-center gap-3">
@@ -425,7 +424,10 @@ export const ProjectRisks = () => {
                                         <div className="flex flex-col gap-0.5">
                                             <div className="flex items-center gap-2">
                                                 <span className="text-[10px] font-mono font-black text-slate-300 bg-slate-100 px-1 rounded-none">{risk.id}</span>
-                                                <span className={`font-bold transition-colors truncate ${isSelected ? 'text-blue-600' : 'text-slate-800 group-hover:text-red-600'}`}>
+                                                <span 
+                                                    onClick={() => handleEdit(risk)}
+                                                    className={`font-bold transition-colors truncate cursor-pointer hover:underline ${isSelected ? 'text-blue-600' : 'text-slate-800 group-hover:text-red-600'}`}
+                                                >
                                                     {risk.title}
                                                 </span>
                                             </div>
@@ -453,7 +455,7 @@ export const ProjectRisks = () => {
                                         </div>
                                     </td>
                                     <td className="py-5 px-4"><StatusBadge status={risk.status} /></td>
-                                    <td className="py-5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                                    <td className="py-5 px-4 text-right">
                                         <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all">
                                             <button 
                                                 onClick={() => handleEdit(risk)}

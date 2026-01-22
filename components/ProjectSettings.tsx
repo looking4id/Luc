@@ -9,7 +9,6 @@ import {
 
 // Sub-page Imports
 import { ProjectInfoView } from './project/settings/ProjectInfoView';
-import { ProjectGuideView } from './project/settings/ProjectGuideView';
 import { MemberManagementView } from './project/settings/MemberManagementView';
 import { PermissionSettingsView } from './project/settings/PermissionSettingsView';
 import { AppSettingsView } from './project/settings/AppSettingsView';
@@ -35,7 +34,7 @@ export const ProjectSettings: React.FC<ProjectSettingsProps> = ({ project }) => 
     {
       title: '基本信息',
       icon: FileText,
-      items: ['项目信息', '项目指引']
+      items: ['项目信息']
     },
     {
       title: '成员与权限',
@@ -72,7 +71,6 @@ export const ProjectSettings: React.FC<ProjectSettingsProps> = ({ project }) => 
   const renderContent = () => {
     switch (activeSubTab) {
       case '项目信息': return <ProjectInfoView project={project} />;
-      case '项目指引': return <ProjectGuideView />;
       case '成员管理': return <MemberManagementView />;
       case '权限设置': return <PermissionSettingsView />;
       case '应用设置': return <AppSettingsView />;
