@@ -15,7 +15,6 @@ import { AppSettingsView } from './project/settings/AppSettingsView';
 import { MessageSettingsView } from './project/settings/MessageSettingsView';
 import { ReportSettingsView } from './project/settings/ReportSettingsView';
 import { AutomationAssistantView } from './project/settings/AutomationAssistantView';
-import { TapdRobotView } from './project/settings/TapdRobotView';
 import { OpenPlatformView } from './project/settings/OpenPlatformView';
 import { DevOpsView } from './project/settings/DevOpsView';
 import { OtherSettingsView } from './project/settings/OtherSettingsView';
@@ -54,7 +53,7 @@ export const ProjectSettings: React.FC<ProjectSettingsProps> = ({ project }) => 
     {
       title: '智能化',
       icon: Zap,
-      items: ['自动化助手', 'TAPD企微机器人']
+      items: ['自动化助手']
     },
     {
       title: '开放与集成',
@@ -77,7 +76,6 @@ export const ProjectSettings: React.FC<ProjectSettingsProps> = ({ project }) => 
       case '消息设置': return <MessageSettingsView />;
       case '报告设置': return <ReportSettingsView />;
       case '自动化助手': return <AutomationAssistantView />;
-      case 'TAPD企微机器人': return <TapdRobotView />;
       case '开放平台': return <OpenPlatformView />;
       case 'DevOps': return <DevOpsView />;
       case '其他设置': return <OtherSettingsView />;

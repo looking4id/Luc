@@ -21,7 +21,6 @@ import { ProjectMilestones } from '../../../components/ProjectMilestones';
 import { ProjectRisks } from '../../../components/ProjectRisks';
 // 替换为全功能效能度量组件
 import { PerformanceMetrics } from '../../../components/PerformanceMetrics';
-import { ProjectMembers } from '../../../components/ProjectMembers';
 import { ProjectSettings } from '../../../components/ProjectSettings';
 import { ProjectVersions } from '../../../components/ProjectVersions';
 import { DefectList } from '../../../components/project/DefectList';
@@ -117,7 +116,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
     { icon: GitPullRequest, label: '代码评审', count: 1 },
     { icon: PlayCircle, label: '流水线' },
     { icon: BarChart2, label: '效能度量', badge: 'Beta' },
-    { icon: Users, label: '成员', count: 5 },
   ];
 
   const visibleCount = 8; 
@@ -144,7 +142,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
         case '流水线': return <ProjectPipeline />;
         // 使用系统级效能度量组件，透传全局属性
         case '效能度量': return <PerformanceMetrics user={user} onLogout={onLogout} onGoHome={onGoHome} />;
-        case '成员': return <ProjectMembers />;
         case '项目设置': return <ProjectSettings project={project} />;
         default: return (
             <div className="flex flex-col items-center justify-center h-96 text-slate-400 dark:text-slate-500">

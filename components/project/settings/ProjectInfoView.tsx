@@ -1,13 +1,32 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Project } from '../../../types';
-import { MoreHorizontal, Box, Users, Clock, HelpCircle } from '../../Icons';
+import { MoreHorizontal, Box, Users, Clock, HelpCircle, Check, XCircle } from '../../Icons';
 
 interface ProjectInfoViewProps {
   project: Project;
 }
 
 export const ProjectInfoView: React.FC<ProjectInfoViewProps> = ({ project }) => {
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [localDescription, setLocalDescription] = useState(project.description || '');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    // 模拟 API 保存过程
+    setTimeout(() => {
+      project.description = localDescription;
+      setIsSaving(false);
+      setIsEditingDescription(false);
+    }, 800);
+  };
+
+  const handleCancel = () => {
+    setLocalDescription(project.description || '');
+    setIsEditingDescription(false);
+  };
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-2 duration-400">
       {/* Header */}
@@ -16,9 +35,51 @@ export const ProjectInfoView: React.FC<ProjectInfoViewProps> = ({ project }) => 
           <div className="w-20 h-20 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-4xl font-black shadow-xl shadow-emerald-100 ring-4 ring-emerald-50">
             {project.name.charAt(0)}
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-3xl font-bold text-slate-800 tracking-tight mb-2">{project.name}</h2>
-            <button className="text-sm font-bold text-blue-600 hover:underline">点击编辑项目描述</button>
+            
+            {isEditingDescription ? (
+              <div className="mt-2 space-y-3 animate-in zoom-in-95 duration-200">
+                <textarea
+                  autoFocus
+                  className="w-full max-w-xl border border-blue-400 rounded-xl px-4 py-3 text-sm focus:ring-4 focus:ring-blue-50 outline-none transition-all min-h-[100px] shadow-lg bg-white"
+                  placeholder="请输入项目描述..."
+                  value={localDescription}
+                  onChange={(e) => setLocalDescription(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <button 
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 shadow-md disabled:opacity-50 transition-all active:scale-95"
+                  >
+                    {isSaving ? '保存中...' : <><Check size={14} /> 保存</>}
+                  </button>
+                  <button 
+                    onClick={handleCancel}
+                    disabled={isSaving}
+                    className="flex items-center gap-1.5 px-4 py-1.5 bg-white border border-slate-200 text-slate-500 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all"
+                  >
+                    取消
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div 
+                onClick={() => setIsEditingDescription(true)}
+                className="group cursor-pointer"
+              >
+                {project.description ? (
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed max-w-2xl group-hover:text-blue-600 transition-colors">
+                    {project.description}
+                  </p>
+                ) : (
+                  <button className="text-sm font-bold text-blue-600 hover:underline">
+                    点击编辑项目描述
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <button className="flex items-center gap-2 px-5 py-2 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">

@@ -28,6 +28,7 @@ export interface Project {
   id: string;
   code: string;
   name: string;
+  description?: string; // 增加项目描述
   type: string;
   manager: User;
   statusLabel: string;
