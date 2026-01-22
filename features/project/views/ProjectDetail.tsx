@@ -10,7 +10,7 @@ import { CreateTaskModal, TaskDetailsModal } from '../kanban/KanbanBoard';
 import { useApp } from '../../../utils/AppContext';
 import { GlobalRightControls } from '../../../components/layout/GlobalRightControls';
 
-// Imported Components - referencing components in original location for now or new if moved
+// Imported Components
 import { ProjectOverview } from '../../../components/ProjectOverview';
 import { WorkItemList } from '../../../components/ProjectWorkItem';
 import { ProjectIterations } from '../../../components/ProjectIteration';
@@ -40,7 +40,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
   const [activeTab, setActiveTab] = useState('项目概览');
   const [isProjectPlusMenuOpen, setIsProjectPlusMenuOpen] = useState(false);
   
-  // 维护项目内的局部工作项状态以支持 CRUD
   const [tasks, setTasks] = useState<Task[]>(
     MOCK_COLUMNS.flatMap(col => col.tasks).map(t => ({ ...t, projectId: project.id }))
   );
@@ -49,19 +48,20 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
   const [createTaskType, setCreateTaskType] = useState<TaskType>(TaskType.Task);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const handleCreateTask = (newTask: Task) => {
-    // 补全必要字段以在列表中正确显示
+  const handleCreateTask = (newTask: Partial<Task>) => {
     const taskToAdd: Task = {
-      ...newTask,
-      id: newTask.id || `t${Date.now()}`,
-      displayId: newTask.displayId || `#RQ-${Math.floor(Math.random() * 1000 + 1000)}`,
+      id: `t${Date.now()}`,
+      displayId: `#RQ-${Math.floor(Math.random() * 9000 + 1000)}`,
+      title: newTask.title || '无标题需求',
       type: newTask.type || createTaskType,
       priority: newTask.priority || Priority.Normal,
-      dueDate: newTask.dueDate || new Date().toISOString().split('T')[0],
+      dueDate: new Date().toISOString().split('T')[0],
       assignee: newTask.assignee || (user ? { id: user.id, name: user.name, avatarColor: user.avatarColor } : { id: 'u1', name: 'lo', avatarColor: 'bg-yellow-500' }),
-      statusColor: newTask.statusColor || 'bg-blue-500',
+      statusColor: 'bg-blue-500',
       creatorId: user?.id || 'u1',
-      projectId: project.id
+      projectId: newTask.projectId || project.id,
+      description: newTask.description || '',
+      attachments: newTask.attachments || []
     };
     setTasks(prev => [taskToAdd, ...prev]);
     setIsCreateModalOpen(false);
@@ -85,7 +85,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
   };
 
   const handleWorkItemClick = (item: Partial<Task>) => {
-    // 补全缺失属性以适配详情组件
     const fullTask: Task = {
       id: item.id || '',
       displayId: item.displayId || '',
@@ -105,7 +104,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
 
   const menuItems = [
     { icon: LayoutDashboard, label: '项目概览' },
-    { icon: FileText, label: '需求', count: tasks.filter(t => t.type === TaskType.Requirement).length + 10 }, // 加上 Mock 数据的基础量
+    { icon: FileText, label: '需求', count: tasks.filter(t => t.type === TaskType.Requirement).length + 10 },
     { icon: CheckSquare, label: '任务', count: tasks.filter(t => t.type === TaskType.Task).length },
     { icon: Bug, label: '缺陷', count: tasks.filter(t => t.type === TaskType.Defect).length },
     { icon: LayoutList, label: '甘特图' },
@@ -128,31 +127,9 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
   const renderContent = () => {
     switch (activeTab) {
         case '项目概览': return <ProjectOverview project={project} onIterationClick={() => setActiveTab('迭代')} />;
-        case '需求': return (
-          <RequirementList 
-            requirements={tasks} 
-            onRequirementClick={handleWorkItemClick} 
-            onCreate={() => openCreateModal(TaskType.Requirement)} 
-          />
-        );
-        case '任务': return (
-            <WorkItemList 
-                project={project} 
-                type={TaskType.Task} 
-                tasks={tasks}
-                onCreate={() => openCreateModal(TaskType.Task)}
-                onTaskClick={handleWorkItemClick}
-                onDelete={handleDeleteTask}
-            />
-        );
-        case '缺陷': return (
-          <DefectList 
-            tasks={tasks} 
-            onCreate={() => openCreateModal(TaskType.Defect)}
-            onDefectClick={handleWorkItemClick}
-            onDelete={handleDeleteTask}
-          />
-        );
+        case '需求': return <RequirementList requirements={tasks} onRequirementClick={handleWorkItemClick} onCreate={() => openCreateModal(TaskType.Requirement)} />;
+        case '任务': return <WorkItemList project={project} type={TaskType.Task} tasks={tasks} onCreate={() => openCreateModal(TaskType.Task)} onTaskClick={handleWorkItemClick} onDelete={handleDeleteTask} />;
+        case '缺陷': return <DefectList tasks={tasks} onCreate={() => openCreateModal(TaskType.Defect)} onDefectClick={handleWorkItemClick} onDelete={handleDeleteTask} />;
         case '甘特图': return <ProjectGantt />;
         case '迭代': return <ProjectIterations />;
         case '测试': return <ProjectTesting />;
@@ -176,7 +153,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
 
   return (
     <div className="flex flex-col h-full w-full bg-slate-50 dark:bg-slate-900 overflow-hidden font-sans transition-colors duration-300">
-      {/* Top Navigation Bar */}
       <div className="h-14 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-4 shadow-sm flex-shrink-0 z-30 transition-colors">
          <div className="flex items-center gap-6">
              <div className="flex items-center gap-3 flex-shrink-0 pr-4 border-r border-slate-200 dark:border-slate-700">
@@ -203,91 +179,48 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack, o
                      )}
                  </div>
              </div>
-
              <div className="flex items-center gap-1">
                  {visibleItems.map(item => (
-                     <button
-                        key={item.label}
-                        onClick={() => setActiveTab(item.label)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded whitespace-nowrap transition-colors flex items-center gap-2 ${
-                            activeTab === item.label 
-                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
-                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-200'
-                        }`}
-                     >
+                     <button key={item.label} onClick={() => setActiveTab(item.label)} className={`px-3 py-1.5 text-sm font-medium rounded whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === item.label ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-200'}`}>
                          <span>{t(item.label)}</span>
                          {item.count !== undefined && item.count > 0 && (
                              <span className={`text-[10px] px-1.5 rounded ${activeTab === item.label ? 'bg-blue-200 dark:bg-blue-800 text-blue-700 dark:text-blue-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>{item.count}</span>
                          )}
                      </button>
                  ))}
-                 {(hiddenItems.length > 0 || true) && (
-                     <div className="relative ml-2">
-                         <button onClick={() => setIsMoreOpen(!isMoreOpen)} className={`flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded transition-colors ${hiddenItems.some(i => i.label === activeTab) || isMoreOpen ? 'text-blue-600 bg-blue-50 dark:bg-slate-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700'}`}>
-                             <span>{t('更多')}</span><ChevronDown size={14} className={`transition-transform duration-200 ${isMoreOpen ? 'rotate-180' : ''}`} />
-                         </button>
-                         {isMoreOpen && (
-                             <>
-                                 <div className="fixed inset-0 z-40" onClick={() => setIsMoreOpen(false)}></div>
-                                 <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl rounded py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                                     {hiddenItems.map(item => (
-                                         <button key={item.label} onClick={() => { setActiveTab(item.label); setIsMoreOpen(false); }} className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${activeTab === item.label ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
-                                             <div className="flex items-center gap-3">
-                                                 <item.icon size={16} className={activeTab === item.label ? 'text-blue-500' : 'text-slate-400'} /><span>{t(item.label)}</span>
-                                             </div>
-                                             {item.count !== undefined && <span className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{item.count}</span>}
-                                         </button>
-                                     ))}
-                                     <div className="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                                     <button 
-                                        onClick={() => { setActiveTab('项目设置'); setIsMoreOpen(false); }} 
-                                        className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${activeTab === '项目设置' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}
-                                     >
+                 <div className="relative ml-2">
+                     <button onClick={() => setIsMoreOpen(!isMoreOpen)} className={`flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded transition-colors ${hiddenItems.some(i => i.label === activeTab) || isMoreOpen ? 'text-blue-600 bg-blue-50 dark:bg-slate-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700'}`}>
+                         <span>{t('更多')}</span><ChevronDown size={14} className={`transition-transform duration-200 ${isMoreOpen ? 'rotate-180' : ''}`} />
+                     </button>
+                     {isMoreOpen && (
+                         <>
+                             <div className="fixed inset-0 z-40" onClick={() => setIsMoreOpen(false)}></div>
+                             <div className="absolute top-full left-0 mt-1 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl rounded py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                                 {hiddenItems.map(item => (
+                                     <button key={item.label} onClick={() => { setActiveTab(item.label); setIsMoreOpen(false); }} className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${activeTab === item.label ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
                                          <div className="flex items-center gap-3">
-                                             <Settings size={16} className={activeTab === '项目设置' ? 'text-blue-500' : 'text-slate-400'} />
-                                             <span>{t('设置')}</span>
+                                             <item.icon size={16} className={activeTab === item.label ? 'text-blue-500' : 'text-slate-400'} /><span>{t(item.label)}</span>
                                          </div>
+                                         {item.count !== undefined && <span className="text-[10px] text-slate-400 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">{item.count}</span>}
                                      </button>
-                                 </div>
-                             </>
-                         )}
-                     </div>
-                 )}
+                                 ))}
+                                 <div className="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                                 <button onClick={() => { setActiveTab('项目设置'); setIsMoreOpen(false); }} className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${activeTab === '项目设置' ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
+                                     <div className="flex items-center gap-3"><Settings size={16} className={activeTab === '项目设置' ? 'text-blue-500' : 'text-slate-400'} /><span>{t('设置')}</span></div>
+                                 </button>
+                             </div>
+                         </>
+                     )}
+                 </div>
              </div>
          </div>
-
-         {/* Right Utilities using GlobalRightControls */}
-         <GlobalRightControls 
-            user={user} 
-            onLogout={onLogout} 
-            onGoHome={onGoHome} 
-         />
+         <GlobalRightControls user={user} onLogout={onLogout} onGoHome={onGoHome} />
       </div>
-
-      {/* Main Content Area */}
       <div className="flex-1 overflow-hidden relative bg-slate-50/50 dark:bg-slate-900/50 transition-colors">
-         <div className="h-full overflow-y-auto p-6 custom-scrollbar">
-             {renderContent()}
-         </div>
+         <div className="h-full overflow-y-auto p-6 custom-scrollbar">{renderContent()}</div>
       </div>
-
-      {/* Modals */}
-      {isCreateModalOpen && (
-          <CreateTaskModal 
-              onClose={() => setIsCreateModalOpen(false)}
-              onSubmit={handleCreateTask}
-              defaultType={createTaskType}
-              defaultProjectId={project.id}
-          />
-      )}
-      {editingTask && (
-          <TaskDetailsModal 
-              task={editingTask}
-              onClose={() => setEditingTask(null)}
-              onUpdate={handleUpdateTask}
-              onDelete={handleDeleteTask}
-          />
-      )}
+      {isCreateModalOpen && <CreateTaskModal onClose={() => setIsCreateModalOpen(false)} onSubmit={handleCreateTask} defaultType={createTaskType} defaultProjectId={project.id} />}
+      {editingTask && <TaskDetailsModal task={editingTask} onClose={() => setEditingTask(null)} onUpdate={handleUpdateTask} onDelete={handleDeleteTask} />}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
 
@@ -114,11 +113,20 @@ export const PieChart = createIcon(LucideIcons.PieChart);
 export const BarChart = createIcon(LucideIcons.BarChart);
 export const MousePointer2 = createIcon(LucideIcons.MousePointer2);
 
+// Fix: Adding missing Info icon export for GlobalRightControls
+export const Info = createIcon(LucideIcons.Info);
+
 export const Image = createIcon(LucideIcons.Image);
 export const Strikethrough = createIcon(LucideIcons.Strikethrough);
 export const Quote = createIcon(LucideIcons.Quote);
 export const Minus = createIcon(LucideIcons.Minus);
 export const Smile = createIcon(LucideIcons.Smile);
+
+// Added missing icons for Kanban board
+export const Sparkles = createIcon(LucideIcons.Sparkles);
+export const Keyboard = createIcon(LucideIcons.Keyboard);
+export const ThumbsUp = createIcon(LucideIcons.ThumbsUp);
+export const ThumbsDown = createIcon(LucideIcons.ThumbsDown);
 
 export const AiIcon = createIcon(LucideIcons.Sparkles);
 
