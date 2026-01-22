@@ -385,6 +385,13 @@ export const TaskDetailsModal: React.FC<{
   ]);
   const [isAddingRelated, setIsAddingRelated] = useState(false);
 
+  // Comment & Logs State
+  const [bottomTab, setBottomTab] = useState<'comments' | 'logs'>('comments');
+  const [commentContent, setCommentContent] = useState('');
+  const [comments, setComments] = useState([
+    { id: 'c1', user: 'looking4id', content: '测试评论功能，请注意查收。', time: '10分钟前', avatar: 'bg-orange-500' }
+  ]);
+
   // History logs
   const historyLogs = [
       { user: 'looking4id', action: '关联了', target: '北京华佑科技有限公司/示例仓库-测试仓库 Pull Request !1', time: '4小时前', icon: GitPullRequest },
@@ -461,6 +468,21 @@ export const TaskDetailsModal: React.FC<{
   const handleMoreSelect = (tabName: string) => {
       setActiveTab(tabName);
       setIsMoreMenuOpen(false);
+  };
+
+  const handleSubmitComment = () => {
+    if (!commentContent.trim()) return;
+    setComments([
+        ...comments,
+        {
+            id: `c-${Date.now()}`,
+            user: 'looking4id',
+            content: commentContent,
+            time: '刚刚',
+            avatar: 'bg-orange-500'
+        }
+    ]);
+    setCommentContent('');
   };
 
   const tabs = [
@@ -562,567 +584,432 @@ export const TaskDetailsModal: React.FC<{
         {/* 4. Content Area */}
         <div className="flex-1 flex overflow-hidden bg-white">
            {/* Left Main Content */}
-           <div className="flex-1 overflow-y-auto custom-scrollbar p-8 border-r border-slate-200">
-               
-               {activeTab === '详情' && (
-                   <div className="space-y-10 animate-in fade-in duration-300">
-                       <div className="grid grid-cols-2 gap-y-8 gap-x-12">
-                            <DetailField label="负责人 / 协作" value={
-                                <div className="flex items-center gap-2">
-                                    <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-bold">L</div>
-                                    <span className="text-slate-700 font-medium">looking4id</span>
-                                </div>
-                            } />
-                            <DetailField label="类型" value="需求" />
-                            <DetailField label="计划时间" value={
-                                <div className="flex items-center gap-2 font-mono text-slate-600">
-                                    2025.08.16 <ArrowRight size={12} className="text-slate-300"/> 2025.09.13
-                                    <Calendar size={14} className="text-slate-400 ml-1"/>
-                                </div>
-                            } />
-                            <DetailField label="项目" value={
-                                <div className="flex items-center gap-2">
-                                    <BookOpen size={14} className="text-slate-400"/>
-                                    <span>敏捷研发项目01</span>
-                                    <ExternalLink size={12} className="text-slate-300"/>
-                                </div>
-                            } />
-                            <DetailField label="迭代" value={
-                                <div className="flex items-center gap-2">
-                                    <span>Sprint2：自助开票功能开发</span>
-                                    <ExternalLink size={12} className="text-slate-300"/>
-                                </div>
-                            } />
-                            <DetailField label="版本" value={
-                                <div className="flex items-center gap-2">
-                                    <span>1.2 - 【示例数据】自助开票功能...</span>
-                                    <ExternalLink size={12} className="text-slate-300"/>
-                                </div>
-                            } />
-                       </div>
-
-                       <div className="group">
-                           <div className="flex items-center gap-2 mb-2">
-                               <span className="font-bold text-slate-500 text-sm">描述</span>
-                               <Edit3 size={14} className="text-slate-300 cursor-pointer hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                               <button className="ml-auto text-slate-300 hover:text-blue-500"><Maximize2 size={14} /></button>
-                           </div>
-                           <div className="text-slate-800 leading-relaxed text-sm">
-                               我需要自助开票功能，以便我吃完饭后可以直接在小程序上完成付款后的开票流程
-                           </div>
-                           <div className="flex gap-2 mt-4">
-                                <button className="p-1.5 border border-slate-200 rounded text-slate-400 hover:text-orange-500 hover:bg-orange-50"><ThumbsUp size={14}/></button>
-                                <button className="p-1.5 border border-slate-200 rounded text-slate-400 hover:text-blue-500 hover:bg-blue-50"><ThumbsDown size={14}/></button>
-                                <button className="p-1.5 border border-slate-200 rounded text-slate-400 hover:text-yellow-500 hover:bg-yellow-50"><Smile size={14}/></button>
-                           </div>
-                       </div>
-                   </div>
-               )}
-
-               {activeTab === '子工作项' && (
-                   <div className="space-y-4">
-                       <div className="flex items-center justify-between mb-2">
-                           <div className="flex items-center gap-4 text-sm text-slate-500">
-                               <button className="flex items-center gap-1 hover:text-slate-800 font-bold text-slate-800">全部 <ChevronDown size={12}/></button>
-                               <button className="flex items-center gap-1 hover:text-slate-800">负责人 <ChevronDown size={12}/></button>
-                               <button className="flex items-center gap-1 hover:text-slate-800">状态 <ChevronDown size={12}/></button>
-                           </div>
-                           <button onClick={() => setIsAddingSubTask(!isAddingSubTask)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
-                               <Plus size={16} /> 添加
-                           </button>
-                       </div>
-
-                       {isAddingSubTask && (
-                           <div className="flex items-center gap-2 p-2 border border-blue-200 rounded bg-blue-50/10 animate-in fade-in slide-in-from-top-2 duration-200">
-                               <div className="relative">
-                                   <select 
-                                       className="appearance-none bg-white border border-slate-200 rounded px-2 py-1.5 text-sm w-24 outline-none focus:border-blue-500 text-slate-600 pl-8"
-                                       value={newSubTaskType}
-                                       onChange={(e) => setNewSubTaskType(e.target.value as TaskType)}
-                                   >
-                                       <option value={TaskType.Requirement}>需求</option>
-                                       <option value={TaskType.Task}>任务</option>
-                                       <option value={TaskType.Defect}>缺陷</option>
-                                   </select>
-                                   <div className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                                       {newSubTaskType === TaskType.Requirement ? <FileText size={14} className="text-purple-500"/> : newSubTaskType === TaskType.Defect ? <Bug size={14} className="text-red-500"/> : <CheckSquare size={14} className="text-blue-500"/>}
-                                   </div>
-                               </div>
-                               <input 
-                                   autoFocus
-                                   className="flex-1 border border-slate-200 rounded px-3 py-1.5 text-sm outline-none focus:border-blue-500"
-                                   placeholder="请输入子工作项标题"
-                                   value={newSubTaskTitle}
-                                   onChange={(e) => setNewSubTaskTitle(e.target.value)}
-                                   onKeyDown={(e) => e.key === 'Enter' && handleAddSubTask()}
-                               />
-                               <div className="relative">
-                                   <select 
-                                       className="appearance-none bg-white border border-slate-200 rounded px-2 py-1.5 text-sm w-32 outline-none focus:border-blue-500 text-slate-600 pl-8"
-                                       value={newSubTaskAssignee}
-                                       onChange={(e) => setNewSubTaskAssignee(e.target.value)}
-                                   >
-                                       {MOCK_USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
-                                   </select>
-                                   <User size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-orange-500 pointer-events-none" />
-                               </div>
-                               <button onClick={handleAddSubTask} className="px-3 py-1.5 bg-green-500 text-white rounded text-sm font-medium hover:bg-green-600">新建</button>
-                               <button onClick={() => setIsAddingSubTask(false)} className="px-3 py-1.5 text-slate-500 hover:text-slate-700 text-sm">取消</button>
-                           </div>
-                       )}
-
-                       <div className="space-y-1">
-                           {subItems.map((item) => (
-                               <div key={item.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
-                                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                                       {item.type === TaskType.Requirement ? <FileText size={16} className="text-purple-500 flex-shrink-0" /> : <CheckSquare size={16} className="text-blue-500 flex-shrink-0" />}
-                                       <span className="text-xs text-slate-400 font-mono flex-shrink-0">{item.id}</span>
-                                       <span className="text-sm text-slate-700 font-medium truncate">{item.title}</span>
-                                   </div>
-                                   <div className="flex items-center gap-6 flex-shrink-0">
-                                       <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded border border-slate-200">{item.status}</span>
-                                       <div className="flex items-center gap-2 w-24">
-                                           <div className={`w-5 h-5 rounded-full ${item.owner.avatarColor} text-white flex items-center justify-center text-[10px]`}>{item.owner.name.charAt(0)}</div>
-                                           <span className="text-sm text-slate-600">{item.owner.name}</span>
-                                       </div>
-                                       <button className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                                           <MoreHorizontal size={16} />
-                                       </button>
-                                   </div>
-                               </div>
-                           ))}
-                       </div>
-                   </div>
-               )}
-
-               {activeTab === '关联工作项' && (
-                   <div className="space-y-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
-                                <button className="flex items-center gap-1 hover:text-slate-800 font-bold text-slate-800">全部 <ChevronDown size={12}/></button>
-                                <button className="flex items-center gap-1 hover:text-slate-800">负责人 <ChevronDown size={12}/></button>
-                                <button className="flex items-center gap-1 hover:text-slate-800">状态 <ChevronDown size={12}/></button>
-                            </div>
-                            <button onClick={() => setIsAddingRelated(!isAddingRelated)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
-                                <Plus size={16} /> 添加
-                            </button>
-                        </div>
-
-                        {isAddingRelated && (
-                            <div className="flex items-center gap-2 p-2 border border-blue-200 rounded bg-blue-50/10 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="flex-1 relative">
-                                    <input className="w-full border border-slate-200 rounded px-3 py-1.5 text-sm outline-none focus:border-blue-500 bg-white placeholder:text-slate-400" placeholder="请选择" />
-                                    <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="relative">
-                                        <select className="appearance-none border border-slate-200 rounded px-2 py-1.5 text-sm w-24 outline-none text-slate-700 bg-white pl-7">
-                                            <option>任务</option>
-                                            <option>需求</option>
-                                            <option>缺陷</option>
-                                        </select>
-                                        <div className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none text-blue-500"><CheckSquare size={14} /></div>
-                                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                    </div>
-                                    <div className="relative">
-                                        <select className="appearance-none border border-slate-200 rounded px-2 py-1.5 text-sm w-24 outline-none text-slate-700 bg-white">
-                                            <option>普通</option>
-                                        </select>
-                                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                    </div>
-                                    <div className="relative">
-                                        <select className="appearance-none border border-slate-200 rounded px-2 py-1.5 text-sm w-28 outline-none text-slate-700 bg-white">
-                                            <option>NORMAL...</option>
-                                            <option>Finish-Start</option>
-                                        </select>
-                                        <HelpCircle size={12} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
-                                        <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                    </div>
-                                </div>
-                                <button className="px-4 py-1.5 bg-emerald-500 text-white rounded text-sm font-bold hover:bg-emerald-600 shadow-sm">新建</button>
-                                <button onClick={() => setIsAddingRelated(false)} className="px-3 py-1.5 text-slate-500 hover:text-slate-700 text-sm">取消</button>
-                            </div>
-                        )}
-
-                        <div className="space-y-1">
-                            {relatedItems.map((item) => (
-                                <div key={item.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
-                                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                                        {item.type === TaskType.Defect ? (
-                                            <div className="p-1 bg-red-500 rounded text-white shadow-sm shadow-red-100 flex-shrink-0"><Bug size={12} strokeWidth={3} /></div>
-                                        ) : item.type === TaskType.Requirement ? (
-                                            <div className="p-1 bg-purple-500 rounded text-white shadow-sm shadow-purple-100 flex-shrink-0"><FileText size={12} strokeWidth={3} /></div>
-                                        ) : (
-                                            <div className="p-1 bg-blue-500 rounded text-white shadow-sm shadow-blue-100 flex-shrink-0"><CheckSquare size={12} strokeWidth={3} /></div>
-                                        )}
-                                        <span className="text-xs text-slate-400 font-mono flex-shrink-0">{item.id}</span>
-                                        <span className="text-sm text-slate-700 font-medium truncate">{item.title}</span>
-                                    </div>
-                                    <div className="flex items-center gap-6 flex-shrink-0">
-                                        <span className={`px-2 py-0.5 text-xs rounded border flex items-center gap-1.5 ${
-                                            item.status === '已确认' ? 'bg-slate-100 text-slate-500 border-slate-200' :
-                                            item.status === '修复中' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                            'bg-slate-100 text-slate-500 border-slate-200'
-                                        }`}>
-                                            {item.status === '进行中' ? <><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>进行中</> : 
-                                            item.status === '修复中' ? <><div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>修复中</> :
-                                            item.status === '已确认' ? <><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>已确认</> :
-                                            <><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>{item.status}</>}
-                                        </span>
-                                        
-                                        <div className="flex items-center gap-2 w-24 justify-end">
-                                            <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">Lo</div>
-                                            <span className="text-sm text-slate-600 truncate">{item.owner}</span>
-                                        </div>
-                                        <button className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <MoreHorizontal size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                   </div>
-               )}
-
-               {/* Related Test Cases Tab */}
-               {activeTab === '关联测试用例' && (
-                   <div className="h-full flex flex-col">
-                       {/* Top Bar with Add Button - Only show if has items or to allow adding from top */}
-                       <div className="flex justify-end mb-4">
-                           <button onClick={() => setIsRelateModalOpen(true)} className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-bold border border-transparent hover:bg-blue-50 px-3 py-1.5 rounded transition-all">
-                               <Plus size={16} /> 添加
-                           </button>
-                       </div>
-
-                       {linkedTestCases.length === 0 ? (
-                           <div className="flex-1 flex flex-col items-center justify-center text-slate-300 gap-4">
-                               <Package size={64} className="opacity-20 text-slate-400" strokeWidth={1} />
-                               <span className="text-sm font-medium text-slate-400">暂无关联测试用例</span>
-                           </div>
-                       ) : (
-                           <div className="space-y-1">
-                               {linkedTestCases.map(tc => (
-                                   <div key={tc.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50 transition-colors">
-                                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                                           <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
-                                           <span className="text-sm text-slate-700 font-bold truncate">{tc.title}</span>
-                                       </div>
-                                       <div className="flex items-center gap-6 flex-shrink-0">
-                                           <span className="text-red-500 border border-red-200 bg-red-50 px-1 py-0.5 rounded text-[10px] font-black">{tc.priority}</span>
-                                           <div className="flex items-center gap-2 w-24">
-                                               <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">L</div>
-                                               <span className="text-xs text-slate-600 font-bold">{tc.maintainer}</span>
-                                           </div>
-                                           <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                                                {tc.result === '已通过' ? <CheckCircle2 size={12} className="text-green-500"/> : <Circle size={12} />}
-                                                <span>{tc.result || '未测试'}</span>
-                                           </div>
-                                           <button 
-                                                onClick={() => handleRemoveTestCase(tc.id)}
-                                                className="text-slate-400 hover:text-red-500 flex items-center gap-1 text-xs font-medium hover:bg-red-50 px-2 py-1 rounded transition-colors"
-                                           >
-                                               <Unlink size={14} /> 取消关联
-                                           </button>
-                                       </div>
-                                   </div>
-                               ))}
-                           </div>
-                       )}
-                   </div>
-               )}
-
-                {/* Related Code Reviews Tab */}
-                {activeTab === '关联代码评审' && (
-                    <div className="space-y-4">
-                        {/* Toolbar */}
-                        <div className="flex items-center justify-end gap-4 mb-2">
-                             <button className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1">
-                                <Unlink size={14} /> 批量取消关联
-                             </button>
-                             <button onClick={() => setIsAddingCodeReview(!isAddingCodeReview)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
-                                <Plus size={16} /> 添加
-                             </button>
-                        </div>
-
-                        {/* Inline Add */}
-                        {isAddingCodeReview && (
-                            <div className="flex items-center gap-2 p-2 border border-blue-200 rounded bg-blue-50/10 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="flex-1 relative">
-                                    <select className="w-full border border-slate-200 rounded px-3 py-1.5 text-sm outline-none focus:border-blue-500 bg-white appearance-none text-slate-700">
-                                        <option>【示例数据】Pull Request 是实现代码质量左移，保障代码质量和规范的绝佳工具</option>
-                                    </select>
-                                    <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                </div>
-                                <button onClick={handleAddCodeReview} className="px-4 py-1.5 bg-emerald-500 text-white rounded text-sm font-bold hover:bg-emerald-600 shadow-sm">关联</button>
-                                <button onClick={() => setIsAddingCodeReview(false)} className="px-3 py-1.5 text-slate-500 hover:text-slate-700 text-sm">取消</button>
-                            </div>
-                        )}
-
-                        {/* List */}
-                        <div className="space-y-1">
-                            {linkedCodeReviews.map(pr => (
-                                <div key={pr.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
-                                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                                         <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">!1</div>
-                                         <span className="text-sm text-slate-700 font-medium truncate">{pr.title}</span>
-                                         <span className="text-red-500 border border-red-200 bg-red-50 px-1 py-0.5 rounded text-[10px] font-bold">{pr.priority}</span>
-                                    </div>
-                                    <div className="flex items-center gap-6 flex-shrink-0">
-                                        <div className="flex items-center gap-3 text-xs">
-                                            <span className="flex items-center gap-1 text-slate-500">评审: <span className="bg-amber-400 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold">Lo</span></span>
-                                            <span className="flex items-center gap-1 text-slate-500">测试: <span className="bg-amber-400 text-white w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold">Lo</span></span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                                            <Circle size={12} />
-                                            <span>{pr.status}</span>
-                                        </div>
-                                        <button onClick={() => handleRemoveCodeReview(pr.id)} className="text-slate-400 hover:text-red-500 flex items-center gap-1 text-xs font-medium hover:bg-red-50 px-2 py-1 rounded transition-colors opacity-0 group-hover:opacity-100">
-                                            <Unlink size={14} /> 取消关联
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Related Documents Tab */}
-                {activeTab === '关联文档' && (
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-end gap-4 mb-2">
-                                <button className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1">
-                                <Unlink size={14} /> 批量取消关联
-                                </button>
-                                <button onClick={() => setIsAddingDocument(!isAddingDocument)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
-                                <Plus size={16} /> 添加
-                                </button>
-                        </div>
-
-                        {isAddingDocument && (
-                            <div className="flex items-center gap-2 p-2 border border-blue-200 rounded bg-blue-50/10 mb-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                <div className="flex-1 relative">
-                                    <select className="w-full border border-slate-200 rounded px-3 py-1.5 text-sm outline-none focus:border-blue-500 bg-white appearance-none text-slate-700">
-                                        <option>【新增】需求规格说明书 v1.2</option>
-                                    </select>
-                                    <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                </div>
-                                <button onClick={handleAddDocument} className="px-4 py-1.5 bg-emerald-500 text-white rounded text-sm font-bold hover:bg-emerald-600 shadow-sm">关联</button>
-                                <button onClick={() => setIsAddingDocument(false)} className="px-3 py-1.5 text-slate-500 hover:text-slate-700 text-sm">取消</button>
-                            </div>
-                        )}
-
-                        <div className="space-y-1">
-                            {linkedDocuments.map(doc => (
-                                <div key={doc.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
-                                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                                            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-                                                <FileText size={16} />
-                                            </div>
-                                            <div className="flex flex-col gap-0.5 min-w-0">
-                                                <span className="text-sm text-slate-700 font-medium truncate">{doc.title}</span>
-                                                <span className="text-xs text-slate-400">{doc.size} • {doc.date}</span>
-                                            </div>
-                                    </div>
-                                    <div className="flex items-center gap-6 flex-shrink-0">
+           <div className="flex-1 flex flex-col min-w-0 border-r border-slate-200 bg-white relative">
+               <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+                   {/* Dynamic Content Area */}
+                   <div className="min-h-[200px]">
+                       {activeTab === '详情' && (
+                           <div className="space-y-10 animate-in fade-in duration-300">
+                               <div className="grid grid-cols-2 gap-y-8 gap-x-12">
+                                    <DetailField label="负责人 / 协作" value={
                                         <div className="flex items-center gap-2">
-                                            <div className="w-5 h-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold">{doc.creator.charAt(0).toUpperCase()}</div>
-                                            <span className="text-xs text-slate-600">{doc.creator}</span>
+                                            <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-bold">L</div>
+                                            <span className="text-slate-700 font-medium">looking4id</span>
                                         </div>
-                                        <span className="text-[10px] font-bold text-slate-400 border border-slate-200 px-1.5 py-0.5 rounded bg-slate-50 uppercase w-12 text-center">{doc.type}</span>
-                                        <button onClick={() => handleRemoveDocument(doc.id)} className="text-slate-400 hover:text-red-500 flex items-center gap-1 text-xs font-medium hover:bg-red-50 px-2 py-1 rounded transition-colors opacity-0 group-hover:opacity-100">
-                                            <Unlink size={14} /> 取消关联
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                                    } />
+                                    <DetailField label="类型" value="需求" />
+                                    <DetailField label="计划时间" value={
+                                        <div className="flex items-center gap-2 font-mono text-slate-600">
+                                            2025.08.16 <ArrowRight size={12} className="text-slate-300"/> 2025.09.13
+                                            <Calendar size={14} className="text-slate-400 ml-1"/>
+                                        </div>
+                                    } />
+                                    <DetailField label="项目" value={
+                                        <div className="flex items-center gap-2">
+                                            <BookOpen size={14} className="text-slate-400"/>
+                                            <span>敏捷研发项目01</span>
+                                            <ExternalLink size={12} className="text-slate-300"/>
+                                        </div>
+                                    } />
+                                    <DetailField label="迭代" value={
+                                        <div className="flex items-center gap-2">
+                                            <span>Sprint2：自助开票功能开发</span>
+                                            <ExternalLink size={12} className="text-slate-300"/>
+                                        </div>
+                                    } />
+                                    <DetailField label="版本" value={
+                                        <div className="flex items-center gap-2">
+                                            <span>1.2 - 【示例数据】自助开票功能...</span>
+                                            <ExternalLink size={12} className="text-slate-300"/>
+                                        </div>
+                                    } />
+                               </div>
 
-               {/* Attachments Tab - High Fidelity Implementation */}
-               {activeTab === '附件' && (
-                   <div className="space-y-4 animate-in fade-in duration-300">
-                       <div className="flex items-center justify-between mb-2">
-                           <span className="text-sm font-bold text-slate-500">共 {attachments.length} 项</span>
-                           <button className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
-                               <Plus size={16} /> 添加
+                               <div className="group">
+                                   <div className="flex items-center gap-2 mb-2">
+                                       <span className="font-bold text-slate-500 text-sm">描述</span>
+                                       <Edit3 size={14} className="text-slate-300 cursor-pointer hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                       <button className="ml-auto text-slate-300 hover:text-blue-500"><Maximize2 size={14} /></button>
+                                   </div>
+                                   <div className="text-slate-800 leading-relaxed text-sm">
+                                       我需要自助开票功能，以便我吃完饭后可以直接在小程序上完成付款后的开票流程
+                                   </div>
+                                   <div className="flex gap-2 mt-4">
+                                        <button className="p-1.5 border border-slate-200 rounded text-slate-400 hover:text-orange-500 hover:bg-orange-50"><ThumbsUp size={14}/></button>
+                                        <button className="p-1.5 border border-slate-200 rounded text-slate-400 hover:text-blue-500 hover:bg-blue-50"><ThumbsDown size={14}/></button>
+                                        <button className="p-1.5 border border-slate-200 rounded text-slate-400 hover:text-yellow-500 hover:bg-yellow-50"><Smile size={14}/></button>
+                                   </div>
+                               </div>
+                           </div>
+                       )}
+
+                       {activeTab === '子工作项' && (
+                           <div className="space-y-4">
+                               <div className="flex items-center justify-between mb-2">
+                                   <div className="flex items-center gap-4 text-sm text-slate-500">
+                                       <button className="flex items-center gap-1 hover:text-slate-800 font-bold text-slate-800">全部 <ChevronDown size={12}/></button>
+                                       <button className="flex items-center gap-1 hover:text-slate-800">负责人 <ChevronDown size={12}/></button>
+                                       <button className="flex items-center gap-1 hover:text-slate-800">状态 <ChevronDown size={12}/></button>
+                                   </div>
+                                   <button onClick={() => setIsAddingSubTask(!isAddingSubTask)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
+                                       <Plus size={16} /> 添加
+                                   </button>
+                               </div>
+
+                               {isAddingSubTask && (
+                                   <div className="flex items-center gap-2 p-2 border border-blue-200 rounded bg-blue-50/10 animate-in fade-in slide-in-from-top-2 duration-200">
+                                       <div className="relative">
+                                           <select 
+                                               className="appearance-none bg-white border border-slate-200 rounded px-2 py-1.5 text-sm w-24 outline-none focus:border-blue-500 text-slate-600 pl-8"
+                                               value={newSubTaskType}
+                                               onChange={(e) => setNewSubTaskType(e.target.value as TaskType)}
+                                           >
+                                               <option value={TaskType.Requirement}>需求</option>
+                                               <option value={TaskType.Task}>任务</option>
+                                               <option value={TaskType.Defect}>缺陷</option>
+                                           </select>
+                                           <div className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                                               {newSubTaskType === TaskType.Requirement ? <FileText size={14} className="text-purple-500"/> : newSubTaskType === TaskType.Defect ? <Bug size={14} className="text-red-500"/> : <CheckSquare size={14} className="text-blue-500"/>}
+                                           </div>
+                                       </div>
+                                       <input 
+                                           autoFocus
+                                           className="flex-1 border border-slate-200 rounded px-3 py-1.5 text-sm outline-none focus:border-blue-500"
+                                           placeholder="请输入子工作项标题"
+                                           value={newSubTaskTitle}
+                                           onChange={(e) => setNewSubTaskTitle(e.target.value)}
+                                           onKeyDown={(e) => e.key === 'Enter' && handleAddSubTask()}
+                                       />
+                                       <div className="relative">
+                                           <select 
+                                               className="appearance-none bg-white border border-slate-200 rounded px-2 py-1.5 text-sm w-32 outline-none focus:border-blue-500 text-slate-600 pl-8"
+                                               value={newSubTaskAssignee}
+                                               onChange={(e) => setNewSubTaskAssignee(e.target.value)}
+                                           >
+                                               {MOCK_USERS.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                                           </select>
+                                           <User size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-orange-500 pointer-events-none" />
+                                       </div>
+                                       <button onClick={handleAddSubTask} className="px-3 py-1.5 bg-green-500 text-white rounded text-sm font-medium hover:bg-green-600">新建</button>
+                                       <button onClick={() => setIsAddingSubTask(false)} className="px-3 py-1.5 text-slate-500 hover:text-slate-700 text-sm">取消</button>
+                                   </div>
+                               )}
+
+                               <div className="space-y-1">
+                                   {subItems.map((item) => (
+                                       <div key={item.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
+                                           <div className="flex items-center gap-3 flex-1 min-w-0">
+                                               {item.type === TaskType.Requirement ? <FileText size={16} className="text-purple-500 flex-shrink-0" /> : <CheckSquare size={16} className="text-blue-500 flex-shrink-0" />}
+                                               <span className="text-xs text-slate-400 font-mono flex-shrink-0">{item.id}</span>
+                                               <span className="text-sm text-slate-700 font-medium truncate">{item.title}</span>
+                                           </div>
+                                           <div className="flex items-center gap-6 flex-shrink-0">
+                                               <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded border border-slate-200">{item.status}</span>
+                                               <div className="flex items-center gap-2 w-24">
+                                                   <div className={`w-5 h-5 rounded-full ${item.owner.avatarColor} text-white flex items-center justify-center text-[10px]`}>{item.owner.name.charAt(0)}</div>
+                                                   <span className="text-sm text-slate-600">{item.owner.name}</span>
+                                               </div>
+                                               <button className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                   <MoreHorizontal size={16} />
+                                               </button>
+                                           </div>
+                                       </div>
+                                   ))}
+                               </div>
+                           </div>
+                       )}
+
+                       {activeTab === '关联工作项' && (
+                           <div className="space-y-4">
+                               <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                                        <button className="flex items-center gap-1 hover:text-slate-800 font-bold text-slate-800">全部 <ChevronDown size={12}/></button>
+                                        <button className="flex items-center gap-1 hover:text-slate-800">负责人 <ChevronDown size={12}/></button>
+                                        <button className="flex items-center gap-1 hover:text-slate-800">状态 <ChevronDown size={12}/></button>
+                                    </div>
+                                    <button onClick={() => setIsAddingRelated(!isAddingRelated)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
+                                        <Plus size={16} /> 添加
+                                    </button>
+                                </div>
+                                <div className="space-y-1">
+                                    {relatedItems.map((item) => (
+                                        <div key={item.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                {item.type === TaskType.Defect ? (
+                                                    <div className="p-1 bg-red-500 rounded text-white shadow-sm shadow-red-100 flex-shrink-0"><Bug size={12} strokeWidth={3} /></div>
+                                                ) : item.type === TaskType.Requirement ? (
+                                                    <div className="p-1 bg-purple-500 rounded text-white shadow-sm shadow-purple-100 flex-shrink-0"><FileText size={12} strokeWidth={3} /></div>
+                                                ) : (
+                                                    <div className="p-1 bg-blue-500 rounded text-white shadow-sm shadow-blue-100 flex-shrink-0"><CheckSquare size={12} strokeWidth={3} /></div>
+                                                )}
+                                                <span className="text-xs text-slate-400 font-mono flex-shrink-0">{item.id}</span>
+                                                <span className="text-sm text-slate-700 font-medium truncate">{item.title}</span>
+                                            </div>
+                                            <div className="flex items-center gap-6 flex-shrink-0">
+                                                <span className={`px-2 py-0.5 text-xs rounded border flex items-center gap-1.5 bg-slate-100 text-slate-500 border-slate-200`}>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>{item.status}
+                                                </span>
+                                                <div className="flex items-center gap-2 w-24 justify-end">
+                                                    <div className="w-6 h-6 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">Lo</div>
+                                                    <span className="text-sm text-slate-600 truncate">{item.owner}</span>
+                                                </div>
+                                                <button className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <MoreHorizontal size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                           </div>
+                       )}
+                       {activeTab === '关联测试用例' && (
+                           <div className="h-full flex flex-col">
+                               <div className="flex justify-end mb-4">
+                                   <button onClick={() => setIsRelateModalOpen(true)} className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-bold border border-transparent hover:bg-blue-50 px-3 py-1.5 rounded transition-all">
+                                       <Plus size={16} /> 添加
+                                   </button>
+                               </div>
+                               {linkedTestCases.length === 0 ? (
+                                   <div className="flex-1 flex flex-col items-center justify-center text-slate-300 gap-4">
+                                       <Package size={64} className="opacity-20 text-slate-400" strokeWidth={1} />
+                                       <span className="text-sm font-medium text-slate-400">暂无关联测试用例</span>
+                                   </div>
+                               ) : (
+                                   <div className="space-y-1">
+                                       {linkedTestCases.map(tc => (
+                                           <div key={tc.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50 transition-colors">
+                                               <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                   <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
+                                                   <span className="text-sm text-slate-700 font-bold truncate">{tc.title}</span>
+                                               </div>
+                                               <div className="flex items-center gap-6 flex-shrink-0">
+                                                   <span className="text-red-500 border border-red-200 bg-red-50 px-1 py-0.5 rounded text-[10px] font-black">{tc.priority}</span>
+                                                   <div className="flex items-center gap-2 w-24">
+                                                       <div className="w-5 h-5 rounded-full bg-orange-500 text-white flex items-center justify-center text-[10px] font-bold shadow-sm">L</div>
+                                                       <span className="text-xs text-slate-600 font-bold">{tc.maintainer}</span>
+                                                   </div>
+                                                   <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                                                        {tc.result === '已通过' ? <CheckCircle2 size={12} className="text-green-500"/> : <Circle size={12} />}
+                                                        <span>{tc.result || '未测试'}</span>
+                                                   </div>
+                                                   <button onClick={() => handleRemoveTestCase(tc.id)} className="text-slate-400 hover:text-red-500 flex items-center gap-1 text-xs font-medium hover:bg-red-50 px-2 py-1 rounded transition-colors"><Unlink size={14} /> 取消关联</button>
+                                               </div>
+                                           </div>
+                                       ))}
+                                   </div>
+                               )}
+                           </div>
+                       )}
+                       {activeTab === '关联代码评审' && (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-end gap-4 mb-2">
+                                     <button className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1"><Unlink size={14} /> 批量取消关联</button>
+                                     <button onClick={() => setIsAddingCodeReview(!isAddingCodeReview)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium"><Plus size={16} /> 添加</button>
+                                </div>
+                                <div className="space-y-1">
+                                    {linkedCodeReviews.map(pr => (
+                                        <div key={pr.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                 <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-500">!1</div>
+                                                 <span className="text-sm text-slate-700 font-medium truncate">{pr.title}</span>
+                                                 <span className="text-red-500 border border-red-200 bg-red-50 px-1 py-0.5 rounded text-[10px] font-bold">{pr.priority}</span>
+                                            </div>
+                                            <div className="flex items-center gap-6 flex-shrink-0">
+                                                <div className="flex items-center gap-1.5 text-xs text-slate-400"><Circle size={12} /><span>{pr.status}</span></div>
+                                                <button onClick={() => handleRemoveCodeReview(pr.id)} className="text-slate-400 hover:text-red-500 flex items-center gap-1 text-xs font-medium hover:bg-red-50 px-2 py-1 rounded transition-colors opacity-0 group-hover:opacity-100"><Unlink size={14} /> 取消关联</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                       )}
+                       {activeTab === '关联文档' && (
+                           <div className="space-y-4">
+                                <div className="flex items-center justify-end gap-4 mb-2">
+                                        <button className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1"><Unlink size={14} /> 批量取消关联</button>
+                                        <button onClick={() => setIsAddingDocument(!isAddingDocument)} className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium"><Plus size={16} /> 添加</button>
+                                </div>
+                                <div className="space-y-1">
+                                    {linkedDocuments.map(doc => (
+                                        <div key={doc.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0"><FileText size={16} /></div>
+                                                    <div className="flex flex-col gap-0.5 min-w-0"><span className="text-sm text-slate-700 font-medium truncate">{doc.title}</span><span className="text-xs text-slate-400">{doc.size} • {doc.date}</span></div>
+                                            </div>
+                                            <div className="flex items-center gap-6 flex-shrink-0">
+                                                <button onClick={() => handleRemoveDocument(doc.id)} className="text-slate-400 hover:text-red-500 flex items-center gap-1 text-xs font-medium hover:bg-red-50 px-2 py-1 rounded transition-colors opacity-0 group-hover:opacity-100"><Unlink size={14} /> 取消关联</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                           </div>
+                       )}
+                       {activeTab === '附件' && (
+                            <div className="space-y-4 animate-in fade-in duration-300">
+                               <div className="flex items-center justify-between mb-2">
+                                   <span className="text-sm font-bold text-slate-500">共 {attachments.length} 项</span>
+                                   <button className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium"><Plus size={16} /> 添加</button>
+                               </div>
+                               <div className="space-y-1">
+                                   {attachments.map(file => (
+                                       <div key={file.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
+                                           <div className="flex items-center gap-3 flex-1 min-w-0">
+                                               <div className="text-slate-400"><Paperclip size={16} /></div>
+                                               <span className="text-sm text-slate-700 font-medium truncate">{file.name}</span>
+                                               <span className="text-xs text-slate-400 font-mono">({file.size})</span>
+                                               <span className="text-xs text-slate-400">{file.time}</span>
+                                           </div>
+                                           <div className="flex items-center gap-4 flex-shrink-0">
+                                               <div className="flex items-center gap-2"><span className="text-sm text-slate-600">{file.uploader}</span><div className={`w-6 h-6 rounded-full ${file.uploaderAvatar} text-white flex items-center justify-center text-[10px] font-bold shadow-sm`}>Lo</div></div>
+                                               <button className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-200 opacity-0 group-hover:opacity-100 transition-opacity"><MoreHorizontal size={16} /></button>
+                                           </div>
+                                       </div>
+                                   ))}
+                               </div>
+                           </div>
+                       )}
+                       {activeTab === '需求版本' && (
+                            <div className="space-y-4 animate-in fade-in duration-300">
+                               <div className="flex items-center justify-between mb-2">
+                                   <span className="text-sm font-bold text-slate-500">共 {reqVersions.length} 项</span>
+                                   <button className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium"><Plus size={16} /> 创建需求版本</button>
+                               </div>
+                               <div className="space-y-1">
+                                   {reqVersions.map(ver => (
+                                       <div key={ver.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
+                                           <div className="flex items-center gap-8 flex-1 min-w-0">
+                                               <span className="text-sm text-slate-700 font-medium w-16">{ver.version}</span>
+                                               <span className="text-sm text-slate-400 w-32">{ver.remark}</span>
+                                               <span className="px-2 py-0.5 bg-green-50 text-green-600 border border-green-200 text-xs rounded">{ver.status}</span>
+                                               <div className="flex items-center gap-2"><div className={`w-6 h-6 rounded-full ${ver.avatar} text-white flex items-center justify-center text-[10px] font-bold shadow-sm`}>Lo</div><span className="text-sm text-slate-600">{ver.editor}</span></div>
+                                               <span className="text-sm text-slate-500 font-mono">{ver.date}</span>
+                                           </div>
+                                           <div className="flex items-center gap-4 flex-shrink-0"><button className="text-blue-600 hover:text-blue-700 text-sm font-medium">查看</button></div>
+                                       </div>
+                                   ))}
+                               </div>
+                           </div>
+                       )}
+                       {activeTab === '工时' && (
+                             <div className="space-y-8 animate-in fade-in duration-300">
+                               <div className="flex items-start justify-between px-2">
+                                   <div className="space-y-2"><div className="text-xs font-bold text-slate-500">预估工时</div><div className="flex items-end gap-2 group cursor-pointer"><span className="text-3xl font-black text-slate-800 leading-none">0</span><span className="text-xs font-bold text-slate-400 mb-1">小时</span><Edit3 size={14} className="text-slate-300 group-hover:text-blue-500 mb-1 transition-colors" /></div></div>
+                                   <div className="w-px h-10 bg-slate-100 mx-4"></div>
+                                   <div className="space-y-2"><div className="text-xs font-bold text-slate-500 flex items-center gap-1">已登记 <Diamond size={12} className="text-amber-400 fill-amber-400" /></div><div className="flex items-end gap-2"><span className="text-3xl font-black text-slate-800 leading-none">15</span><span className="text-xs font-bold text-slate-400 mb-1">小时</span></div></div>
+                                   <div className="w-px h-10 bg-slate-100 mx-4"></div>
+                                   <div className="space-y-2"><div className="text-xs font-bold text-slate-500 flex items-center gap-1">剩余 <Diamond size={12} className="text-amber-400 fill-amber-400" /></div><div className="flex items-end gap-2"><span className="text-3xl font-black text-slate-800 leading-none">0</span><span className="text-xs font-bold text-slate-400 mb-1">小时</span></div></div>
+                                   <div className="w-px h-10 bg-slate-100 mx-4"></div>
+                                   <div className="flex-1 space-y-2 max-w-xs"><div className="text-xs font-bold text-slate-500 flex items-center gap-1">工作项进度 <Diamond size={12} className="text-amber-400 fill-amber-400" /></div><div className="flex items-center gap-3"><div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-slate-300" style={{ width: '0%' }}></div></div><span className="text-sm font-bold text-slate-400">0%</span></div></div>
+                               </div>
+                               <div className="border border-slate-200 rounded-lg overflow-hidden">
+                                   <div className="bg-slate-50 px-6 py-3 border-b border-slate-200 flex items-center justify-between"><span className="text-xs font-bold text-slate-500">共登记 {workLogs.length} 次</span><button className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-1.5 rounded shadow-sm shadow-emerald-100 transition-all active:scale-95">登记工时</button></div>
+                                   <div className="divide-y divide-slate-100 bg-white">
+                                       {workLogs.map(log => (
+                                           <div key={log.id} className="p-4 flex items-start gap-4 group hover:bg-slate-50/50 transition-colors">
+                                               <div className={`w-10 h-10 rounded-full ${log.avatarColor} text-white flex items-center justify-center text-sm font-bold shadow-sm flex-shrink-0`}>{log.name.substring(0, 2)}</div>
+                                               <div className="flex-1 min-w-0 pt-0.5"><div className="flex items-center gap-2 mb-1"><span className="text-sm font-bold text-slate-700">{log.name}</span><span className="text-xs font-mono text-slate-400">{log.date}</span><span className="text-xs text-slate-500">登记了 <span className="font-bold text-slate-900">{log.hours} 小时</span></span></div><div className="text-sm text-slate-600 truncate">{log.desc}</div></div>
+                                               <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity self-center"><button className="flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-blue-600 transition-colors"><Edit3 size={14} /> 编辑</button><button className="flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-red-500 transition-colors"><Trash2 size={14} /> 删除</button></div>
+                                           </div>
+                                       ))}
+                                   </div>
+                               </div>
+                           </div>
+                       )}
+                   </div>
+
+                   {/* Shared Comments and Activity Section (Always Visible at bottom) */}
+                   <div className="mt-12 pt-8 border-t border-slate-100">
+                       <div className="flex gap-6 mb-6">
+                           <button 
+                                onClick={() => setBottomTab('comments')}
+                                className={`text-sm font-bold pb-2 transition-colors ${bottomTab === 'comments' ? 'text-slate-800 border-b-2 border-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+                           >
+                                评论 <span className="bg-slate-100 px-1.5 rounded-full text-xs text-slate-500 ml-1">{comments.length}</span>
+                           </button>
+                           <button 
+                                onClick={() => setBottomTab('logs')}
+                                className={`text-sm font-bold pb-2 transition-colors ${bottomTab === 'logs' ? 'text-slate-800 border-b-2 border-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+                           >
+                                操作日志 <span className="bg-slate-100 px-1.5 rounded-full text-xs text-slate-500 ml-1">{historyLogs.length}</span>
                            </button>
                        </div>
                        
-                       <div className="space-y-1">
-                           {attachments.map(file => (
-                               <div key={file.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
-                                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                                       <div className="text-slate-400"><Paperclip size={16} /></div>
-                                       <span className="text-sm text-slate-700 font-medium truncate">{file.name}</span>
-                                       <span className="text-xs text-slate-400 font-mono">({file.size})</span>
-                                       <span className="text-xs text-slate-400">{file.time}</span>
-                                   </div>
-                                   <div className="flex items-center gap-4 flex-shrink-0">
-                                       <div className="flex items-center gap-2">
-                                           <span className="text-sm text-slate-600">{file.uploader}</span>
-                                           <div className={`w-6 h-6 rounded-full ${file.uploaderAvatar} text-white flex items-center justify-center text-[10px] font-bold shadow-sm`}>Lo</div>
-                                       </div>
-                                       <button className="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-200 opacity-0 group-hover:opacity-100 transition-opacity">
-                                           <MoreHorizontal size={16} />
-                                       </button>
-                                   </div>
-                               </div>
-                           ))}
-                       </div>
-                   </div>
-               )}
-
-               {/* Requirement Versions Tab - High Fidelity Implementation */}
-               {activeTab === '需求版本' && (
-                   <div className="space-y-4 animate-in fade-in duration-300">
-                       <div className="flex items-center justify-between mb-2">
-                           <span className="text-sm font-bold text-slate-500">共 {reqVersions.length} 项</span>
-                           <button className="text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 font-medium">
-                               <Plus size={16} /> 创建需求版本
-                           </button>
-                       </div>
-
-                       <div className="space-y-1">
-                           {reqVersions.map(ver => (
-                               <div key={ver.id} className="flex items-center justify-between py-3 px-2 hover:bg-slate-50 rounded group border-b border-slate-50">
-                                   <div className="flex items-center gap-8 flex-1 min-w-0">
-                                       <span className="text-sm text-slate-700 font-medium w-16">{ver.version}</span>
-                                       <span className="text-sm text-slate-400 w-32">{ver.remark}</span>
-                                       <span className="px-2 py-0.5 bg-green-50 text-green-600 border border-green-200 text-xs rounded">{ver.status}</span>
-                                       <div className="flex items-center gap-2">
-                                           <div className={`w-6 h-6 rounded-full ${ver.avatar} text-white flex items-center justify-center text-[10px] font-bold shadow-sm`}>Lo</div>
-                                           <span className="text-sm text-slate-600">{ver.editor}</span>
-                                       </div>
-                                       <span className="text-sm text-slate-500 font-mono">{ver.date}</span>
-                                   </div>
-                                   <div className="flex items-center gap-4 flex-shrink-0">
-                                       <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">查看</button>
-                                   </div>
-                               </div>
-                           ))}
-                       </div>
-                   </div>
-               )}
-
-               {/* Work Hours Tab - High Fidelity Implementation */}
-               {activeTab === '工时' && (
-                   <div className="space-y-8 animate-in fade-in duration-300">
-                       {/* Statistics Row */}
-                       <div className="flex items-start justify-between px-2">
-                           <div className="space-y-2">
-                               <div className="text-xs font-bold text-slate-500">预估工时</div>
-                               <div className="flex items-end gap-2 group cursor-pointer">
-                                   <span className="text-3xl font-black text-slate-800 leading-none">0</span>
-                                   <span className="text-xs font-bold text-slate-400 mb-1">小时</span>
-                                   <Edit3 size={14} className="text-slate-300 group-hover:text-blue-500 mb-1 transition-colors" />
-                               </div>
-                           </div>
-                           
-                           <div className="w-px h-10 bg-slate-100 mx-4"></div>
-
-                           <div className="space-y-2">
-                               <div className="text-xs font-bold text-slate-500 flex items-center gap-1">
-                                   已登记 <Diamond size={12} className="text-amber-400 fill-amber-400" />
-                               </div>
-                               <div className="flex items-end gap-2">
-                                   <span className="text-3xl font-black text-slate-800 leading-none">15</span>
-                                   <span className="text-xs font-bold text-slate-400 mb-1">小时</span>
-                               </div>
-                           </div>
-
-                           <div className="w-px h-10 bg-slate-100 mx-4"></div>
-
-                           <div className="space-y-2">
-                               <div className="text-xs font-bold text-slate-500 flex items-center gap-1">
-                                   剩余 <Diamond size={12} className="text-amber-400 fill-amber-400" />
-                               </div>
-                               <div className="flex items-end gap-2">
-                                   <span className="text-3xl font-black text-slate-800 leading-none">0</span>
-                                   <span className="text-xs font-bold text-slate-400 mb-1">小时</span>
-                               </div>
-                           </div>
-
-                           <div className="w-px h-10 bg-slate-100 mx-4"></div>
-
-                           <div className="flex-1 space-y-2 max-w-xs">
-                               <div className="text-xs font-bold text-slate-500 flex items-center gap-1">
-                                   工作项进度 <Diamond size={12} className="text-amber-400 fill-amber-400" />
-                               </div>
-                               <div className="flex items-center gap-3">
-                                   <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                                       <div className="h-full bg-slate-300" style={{ width: '0%' }}></div>
-                                   </div>
-                                   <span className="text-sm font-bold text-slate-400">0%</span>
-                               </div>
-                           </div>
-                       </div>
-
-                       {/* Work Logs List */}
-                       <div className="border border-slate-200 rounded-lg overflow-hidden">
-                           <div className="bg-slate-50 px-6 py-3 border-b border-slate-200 flex items-center justify-between">
-                               <span className="text-xs font-bold text-slate-500">共登记 {workLogs.length} 次</span>
-                               <button className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-4 py-1.5 rounded shadow-sm shadow-emerald-100 transition-all active:scale-95">
-                                   登记工时
-                               </button>
-                           </div>
-                           <div className="divide-y divide-slate-100 bg-white">
-                               {workLogs.map(log => (
-                                   <div key={log.id} className="p-4 flex items-start gap-4 group hover:bg-slate-50/50 transition-colors">
-                                       <div className={`w-10 h-10 rounded-full ${log.avatarColor} text-white flex items-center justify-center text-sm font-bold shadow-sm flex-shrink-0`}>
-                                           {log.name.substring(0, 2)}
-                                       </div>
-                                       <div className="flex-1 min-w-0 pt-0.5">
-                                           <div className="flex items-center gap-2 mb-1">
-                                               <span className="text-sm font-bold text-slate-700">{log.name}</span>
-                                               <span className="text-xs font-mono text-slate-400">{log.date}</span>
-                                               <span className="text-xs text-slate-500">登记了 <span className="font-bold text-slate-900">{log.hours} 小时</span></span>
-                                           </div>
-                                           <div className="text-sm text-slate-600 truncate">{log.desc}</div>
-                                       </div>
-                                       <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity self-center">
-                                           <button className="flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-blue-600 transition-colors">
-                                               <Edit3 size={14} /> 编辑
-                                           </button>
-                                           <button className="flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-red-500 transition-colors">
-                                               <Trash2 size={14} /> 删除
-                                           </button>
-                                       </div>
-                                   </div>
-                               ))}
-                           </div>
-                       </div>
-                   </div>
-               )}
-
-               {/* Comments and Activity Section */}
-               <div className="mt-12 pt-8 border-t border-slate-100">
-                   <div className="flex gap-6 mb-6">
-                       <button className="text-sm font-bold text-slate-500 hover:text-slate-700 pb-1">评论 <span className="bg-slate-100 px-1.5 rounded-full text-xs text-slate-500 ml-1">1</span></button>
-                       <button className="text-sm font-bold text-blue-600 border-b-2 border-blue-600 pb-1">操作日志 <span className="bg-slate-100 px-1.5 rounded-full text-xs text-slate-500 ml-1">6</span></button>
-                   </div>
-                   
-                   <div className="space-y-6 mb-8">
-                        {historyLogs.map((log, idx) => (
-                            <div key={idx} className="flex gap-3 text-sm group">
-                                <div className="mt-0.5 text-slate-300 group-hover:text-blue-500 transition-colors"><log.icon size={16} /></div>
-                                <div className="flex-1">
-                                    <div className="text-slate-600">
-                                        <span className="font-bold text-slate-800 mr-1">{log.user}</span>
-                                        <span className="mr-1">{log.action}</span>
-                                        <span className="font-medium text-slate-800">{log.target}</span>
-                                    </div>
-                                    <div className="text-xs text-slate-400 mt-0.5">{log.time}</div>
+                       {bottomTab === 'comments' && (
+                           <div className="space-y-6 mb-8 animate-in fade-in duration-300">
+                                <div className="space-y-6">
+                                    {comments.map(c => (
+                                        <div key={c.id} className="flex gap-3">
+                                            <div className={`w-8 h-8 rounded-full ${c.avatar} text-white flex items-center justify-center text-xs font-bold`}>{c.user.charAt(0).toUpperCase()}</div>
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-bold text-slate-700 text-sm">{c.user}</span>
+                                                    <span className="text-xs text-slate-400">{c.time}</span>
+                                                </div>
+                                                <div className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg rounded-tl-none border border-slate-100">
+                                                    {c.content}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            </div>
-                        ))}
+
+                                <div className="flex gap-3 items-start pt-2">
+                                    <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">Lo</div>
+                                    <div className="flex-1 border border-slate-200 rounded p-2 bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
+                                        <textarea 
+                                            className="w-full text-sm outline-none resize-none h-16 placeholder:text-slate-400 block" 
+                                            placeholder="发表您的看法 (Ctrl/Command+Enter发送)"
+                                            value={commentContent}
+                                            onChange={e => setCommentContent(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    handleSubmitComment();
+                                                }
+                                            }}
+                                        ></textarea>
+                                        <div className="flex justify-end mt-2">
+                                            <button 
+                                                onClick={handleSubmitComment}
+                                                disabled={!commentContent.trim()}
+                                                className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+                                            >
+                                                发送
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                           </div>
+                       )}
+
+                       {bottomTab === 'logs' && (
+                           <div className="space-y-6 mb-8 animate-in fade-in duration-300">
+                                {historyLogs.map((log, idx) => (
+                                    <div key={idx} className="flex gap-3 text-sm group">
+                                        <div className="mt-0.5 text-slate-300 group-hover:text-blue-500 transition-colors"><log.icon size={16} /></div>
+                                        <div className="flex-1">
+                                            <div className="text-slate-600">
+                                                <span className="font-bold text-slate-800 mr-1">{log.user}</span>
+                                                <span className="mr-1">{log.action}</span>
+                                                <span className="font-medium text-slate-800">{log.target}</span>
+                                            </div>
+                                            <div className="text-xs text-slate-400 mt-0.5">{log.time}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                           </div>
+                       )}
                    </div>
 
-                   <div className="flex gap-3 items-start sticky bottom-0 bg-white pt-2 pb-4">
-                       <div className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">Lo</div>
-                       <div className="flex-1 border border-slate-200 rounded p-2 bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
-                           <textarea className="w-full text-sm outline-none resize-none h-16 placeholder:text-slate-400" placeholder="发表您的看法 (Ctrl/Command+Enter发送)"></textarea>
-                       </div>
+                   {/* Floating Cancel Button */}
+                   <div className="absolute bottom-6 right-6 z-50">
+                        <button 
+                            onClick={onClose} 
+                            className="flex items-center justify-center w-10 h-10 bg-white border border-slate-200 rounded-full shadow-lg text-slate-400 hover:text-red-500 hover:border-red-100 hover:shadow-xl transition-all" 
+                            title="取消并关闭"
+                        >
+                            <XCircle size={24} />
+                        </button>
                    </div>
                </div>
            </div>
@@ -1176,7 +1063,7 @@ export const TaskDetailsModal: React.FC<{
 };
 
 // ------------------- Kanban Board Core -------------------
-
+/* (Keep existing KanbanBoard component unchanged) */
 interface KanbanBoardProps {
     columns: Column[];
     setColumns: React.Dispatch<React.SetStateAction<Column[]>>;
