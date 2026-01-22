@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import {
-  LayoutGrid, ClipboardList, Code2, BookOpen, Users, BarChart2, Settings, 
-  ChevronDown, GLogo, ListFilter, Plus, ChevronLeft, ChevronRight, Search,
-  Briefcase
+  Home, Layers, Target, Code2, BookOpen, Users, Activity, Settings, 
+  ChevronDown, GLogo, ChevronLeft, ChevronRight
 } from './Icons';
 import { SavedView } from '../types';
 
@@ -16,13 +15,13 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
   const [isExpanded, setIsExpanded] = useState(true);
 
   const menuItems = [
-    { icon: LayoutGrid, label: '工作台' },
-    { icon: Briefcase, label: '项目' },
-    { icon: ClipboardList, label: '工作项' },
+    { icon: Home, label: '工作台' },
+    { icon: Layers, label: '项目' },
+    { icon: Target, label: '工作项' },
     { icon: Code2, label: '代码' },
     { icon: BookOpen, label: '知识库' },
     { icon: Users, label: '成员' },
-    { icon: BarChart2, label: '效能度量' },
+    { icon: Activity, label: '效能度量' },
     { icon: Settings, label: '设置' },
   ];
 
@@ -53,7 +52,7 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
               }`}
               title={!isExpanded ? item.label : ''}
             >
-              <item.icon size={20} strokeWidth={isActive ? 2 : 1.5} />
+              <item.icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
               {isExpanded && <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>}
             </div>
           );
