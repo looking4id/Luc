@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   MoreHorizontal, Zap, Maximize2, Activity, Target, 
   CheckCircle2, Clock, AlertTriangle, TrendingUp, Flag, 
@@ -13,7 +13,38 @@ interface ProjectOverviewProps {
   onIterationClick?: () => void;
 }
 
+type LoadType = '需求' | '缺陷' | '任务';
+
 export const ProjectOverview: React.FC<ProjectOverviewProps> = ({ project, onIterationClick }) => {
+  const [loadType, setLoadType] = useState<LoadType>('需求');
+
+  // 模拟不同维度的负载数据
+  const mockData: Record<LoadType, Array<{ user: string; val: number; color: string }>> = {
+    '需求': [
+      { user: '王亮', val: 18, color: 'bg-blue-500' },
+      { user: 'Dev 1', val: 12, color: 'bg-indigo-400' },
+      { user: '测试', val: 8, color: 'bg-cyan-400' },
+      { user: '产品', val: 5, color: 'bg-slate-400' },
+      { user: 'UI', val: 7, color: 'bg-purple-400' }
+    ],
+    '缺陷': [
+      { user: '王亮', val: 4, color: 'bg-rose-500' },
+      { user: 'Dev 1', val: 15, color: 'bg-rose-400' },
+      { user: '测试', val: 3, color: 'bg-rose-300' },
+      { user: '产品', val: 1, color: 'bg-slate-400' },
+      { user: 'UI', val: 2, color: 'bg-purple-400' }
+    ],
+    '任务': [
+      { user: '王亮', val: 10, color: 'bg-emerald-500' },
+      { user: 'Dev 1', val: 8, color: 'bg-emerald-400' },
+      { user: '测试', val: 12, color: 'bg-emerald-300' },
+      { user: '产品', val: 14, color: 'bg-slate-400' },
+      { user: 'UI', val: 6, color: 'bg-purple-400' }
+    ]
+  };
+
+  const currentData = mockData[loadType];
+
   return (
     <div className="space-y-6">
       {/* 第一行：核心概览与健康度 */}
@@ -52,9 +83,19 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({ project, onIte
                     成员负载分析
                 </h3>
                 <div className="flex items-center gap-4 text-sm font-bold">
-                    <span className="text-blue-600 border-b-2 border-blue-600 pb-1 cursor-pointer">需求</span>
-                    <span className="text-slate-400 hover:text-slate-600 cursor-pointer">缺陷</span>
-                    <span className="text-slate-400 hover:text-slate-600 cursor-pointer">任务</span>
+                    {(['需求', '缺陷', '任务'] as LoadType[]).map((type) => (
+                      <span 
+                        key={type}
+                        onClick={() => setLoadType(type)}
+                        className={`pb-1 cursor-pointer transition-all border-b-2 ${
+                          loadType === type 
+                            ? 'text-blue-600 border-blue-600' 
+                            : 'text-slate-400 border-transparent hover:text-slate-600'
+                        }`}
+                      >
+                        {type}
+                      </span>
+                    ))}
                 </div>
             </div>
             
@@ -67,18 +108,12 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({ project, onIte
                     ))}
                 </div>
 
-                {[
-                    { user: '王亮', val: 18, color: 'bg-blue-500' },
-                    { user: 'Dev 1', val: 12, color: 'bg-indigo-400' },
-                    { user: '测试', val: 8, color: 'bg-cyan-400' },
-                    { user: '产品', val: 5, color: 'bg-slate-400' },
-                    { user: 'UI', val: 7, color: 'bg-purple-400' }
-                ].map((d, i) => (
+                {currentData.map((d, i) => (
                     <div key={i} className="flex flex-col items-center gap-3 z-10 w-10 group">
                         <div className="w-full bg-slate-50 rounded-t-md h-44 relative overflow-hidden">
                             <div 
                                 style={{ height: `${(d.val / 20) * 100}%` }} 
-                                className={`absolute bottom-0 left-0 right-0 ${d.color} transition-all duration-1000 group-hover:brightness-110 shadow-sm`}
+                                className={`absolute bottom-0 left-0 right-0 ${d.color} transition-all duration-700 ease-out group-hover:brightness-110 shadow-sm`}
                             ></div>
                         </div>
                         <span className="text-xs font-bold text-slate-500">{d.user}</span>
@@ -102,12 +137,15 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({ project, onIte
                 </button>
             </div>
             <div className="p-6">
-                <div className="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 hover:bg-white hover:shadow-md transition-all cursor-pointer">
+                <div 
+                    onClick={onIterationClick}
+                    className="bg-slate-50/50 border border-slate-100 rounded-2xl p-6 hover:bg-white hover:shadow-md hover:border-blue-200 transition-all cursor-pointer group"
+                >
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center text-white text-xl font-black shadow-lg shadow-orange-100">Sp</div>
+                            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center text-white text-xl font-black shadow-lg shadow-orange-100 group-hover:scale-105 transition-transform">Sp</div>
                             <div>
-                                <h4 className="text-sm font-bold text-slate-800 mb-1">Sprint 1: 核心业务流程闭环</h4>
+                                <h4 className="text-sm font-bold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">Sprint 1: 核心业务流程闭环</h4>
                                 <div className="flex items-center gap-3">
                                     <StatusBadge status="进行中" />
                                     <span className="text-xs text-slate-400 font-mono">12.01 - 12.14</span>
