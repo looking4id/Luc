@@ -1,6 +1,6 @@
 
-import { MOCK_PROJECTS as INITIAL_PROJECTS, MOCK_USERS, MOCK_COLUMNS } from '../constants';
-import { Project, Task, WorkbenchData, ApiResponse, TaskType, Priority } from '../types';
+import { MOCK_PROJECTS as INITIAL_PROJECTS, MOCK_USERS, MOCK_COLUMNS } from '../utils/constants';
+import { Project, Task, WorkbenchData, ApiResponse, TaskType, Priority } from '../types/index';
 
 // Session-based project storage
 let sessionProjects = [...INITIAL_PROJECTS];
@@ -8,16 +8,12 @@ let sessionProjects = [...INITIAL_PROJECTS];
 // Simulate network delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper to wrap response in Ruoyi format
 const success = <T>(data: T): ApiResponse<T> => ({
   code: 0, 
   data,
   msg: 'success'
 });
 
-/**
- * Service: Auth
- */
 export const AuthService = {
   login: async (username: string, password: string): Promise<ApiResponse<{ token: string; user: any }>> => {
     await delay(800);
@@ -27,26 +23,20 @@ export const AuthService = {
         user: MOCK_USERS[0]
       });
     }
-    // Simple mock error
     return { code: 500, data: null as any, msg: '账号或密码错误 (提示: admin/123456)' };
   }
 };
 
-/**
- * Service: Project Management
- */
 export const ProjectService = {
   list: async (): Promise<ApiResponse<Project[]>> => {
     await delay(300);
     return success([...sessionProjects]);
   },
-
   getById: async (id: string): Promise<ApiResponse<Project | undefined>> => {
     await delay(200);
     const project = sessionProjects.find(p => p.id === id);
     return success(project);
   },
-
   create: async (projectData: Partial<Project>): Promise<ApiResponse<Project>> => {
     await delay(500);
     const newProject: Project = {
@@ -67,16 +57,12 @@ export const ProjectService = {
   }
 };
 
-/**
- * Service: Task Management
- */
 export const TaskService = {
   list: async (): Promise<ApiResponse<Task[]>> => {
     await delay(300);
     const all = MOCK_COLUMNS.flatMap(col => col.tasks);
     return success(all);
   },
-
   getMyTasks: async (userId: string): Promise<ApiResponse<Task[]>> => {
     await delay(300);
     const all = MOCK_COLUMNS.flatMap(col => col.tasks);
@@ -85,13 +71,9 @@ export const TaskService = {
   }
 };
 
-/**
- * Service: Workbench Dashboard
- */
 export const WorkbenchService = {
   getData: async (userId: string): Promise<ApiResponse<WorkbenchData>> => {
     await delay(600);
-    
     const allTasks = MOCK_COLUMNS.flatMap(col => col.tasks);
     const myTasks = allTasks.filter(t => t.assignee?.id === userId && t.statusColor !== 'bg-green-500');
     const doneTasks = allTasks.filter(t => t.assignee?.id === userId && t.statusColor === 'bg-green-500');

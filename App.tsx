@@ -10,10 +10,9 @@ import { Workbench } from './features/workbench/Workbench';
 import { Login } from './features/auth/Login';
 import { CodeManagement } from './components/CodeManagement';
 import { KnowledgeBase } from './components/KnowledgeBase';
-import { MemberManagement } from './components/MemberManagement';
 import { PerformanceMetrics } from './components/PerformanceMetrics';
 import { SystemSettings } from './components/SystemSettings';
-import { FilterState, ViewType, SavedView, TaskType, User, Project, Task } from './types';
+import { FilterState, ViewType, SavedView, TaskType, User, Project, Task } from './types/index';
 import { AppProvider } from './utils/AppContext';
 
 const AppContent = () => {
@@ -115,8 +114,6 @@ const AppContent = () => {
         return <CodeManagement user={currentUser} onLogout={handleLogout} onGoHome={handleGoHome} />;
       case '知识库': 
         return <KnowledgeBase user={currentUser} onLogout={handleLogout} onGoHome={handleGoHome} />;
-      case '成员': 
-        return <MemberManagement user={currentUser} onLogout={handleLogout} onGoHome={handleGoHome} />;
       case '效能度量': 
         return <PerformanceMetrics user={currentUser} onLogout={handleLogout} onGoHome={handleGoHome} />;
       case '设置': 
@@ -134,7 +131,7 @@ const AppContent = () => {
                 onLogout={handleLogout}
                 onGoHome={handleGoHome}
               />
-              <FilterBar filters={filters} setFilters={setFilters} viewType={viewType} setViewType={setViewType} onTriggerCreate={handleTriggerCreate} />
+              <FilterBar filters={filters} setFilters={setFilters} viewType={viewType} setViewType={setViewType} onTriggerCreate={handleTriggerCreate} onSaveView={() => {}} />
               <WorkItemsView 
                 filters={filters} 
                 viewType={viewType} 

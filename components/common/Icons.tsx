@@ -1,3 +1,4 @@
+
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
 
@@ -103,6 +104,15 @@ export const Send = createIcon(LucideIcons.Send);
 export const ToggleLeft = createIcon(LucideIcons.ToggleLeft);
 export const ToggleRight = createIcon(LucideIcons.ToggleRight);
 export const Square = createIcon(LucideIcons.Square);
+export const Package = createIcon(LucideIcons.Package);
+export const ExternalLink = createIcon(LucideIcons.ExternalLink);
+export const Cpu = createIcon(LucideIcons.Cpu);
+export const ArrowUpRight = createIcon(LucideIcons.ArrowUpRight);
+
+// Fix: Exporting missing icons needed for PerformanceMetrics
+export const PieChart = createIcon(LucideIcons.PieChart);
+export const BarChart = createIcon(LucideIcons.BarChart);
+export const MousePointer2 = createIcon(LucideIcons.MousePointer2);
 
 export const Image = createIcon(LucideIcons.Image);
 export const Strikethrough = createIcon(LucideIcons.Strikethrough);

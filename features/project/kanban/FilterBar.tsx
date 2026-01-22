@@ -10,6 +10,8 @@ interface FilterBarProps {
   viewType: ViewType;
   setViewType: (view: ViewType) => void;
   onTriggerCreate: (type: TaskType) => void;
+  /* Add onSaveView optional property to match App.tsx usage */
+  onSaveView?: () => void;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({ filters, setFilters, viewType, setViewType, onTriggerCreate }) => {

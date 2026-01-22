@@ -132,3 +132,32 @@ export interface WorkbenchData {
     time: string;
   }[];
 }
+
+// ------------------- Metrics Related Types -------------------
+
+/* Add MetricSummary interface for performance metrics dashboard */
+export interface MetricSummary {
+  id: string;
+  label: string;
+  value: string;
+  unit: string;
+  trend: number;
+  isPositiveBetter: boolean;
+}
+
+/* Add MetricSection interface for performance metrics dashboard */
+export interface MetricSection {
+  id: string;
+  title: string;
+  icon: any;
+  metrics: MetricSummary[];
+}
+
+/* Add DetailItem interface for drill-down views in metrics */
+export interface DetailItem {
+  id: string;
+  title: string;
+  status: string;
+  owner: string;
+  updatedAt: string;
+}

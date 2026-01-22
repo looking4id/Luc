@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   LayoutGrid, ClipboardList, Code2, BookOpen, Users, BarChart2, Settings, 
@@ -21,7 +20,6 @@ export const MainSidebar: React.FC<MainSidebarProps> = ({ activeItem, onSelectIt
     { icon: ClipboardList, label: '工作项' },
     { icon: Code2, label: '代码' },
     { icon: BookOpen, label: '知识库' },
-    { icon: Users, label: '成员' },
     { icon: BarChart2, label: '效能度量' },
     { icon: Settings, label: '设置' },
   ];
