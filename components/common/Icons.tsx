@@ -1,3 +1,4 @@
+
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
 
@@ -75,6 +76,7 @@ export const Home = createIcon(LucideIcons.Home);
 export const Grid = createIcon(LucideIcons.Grid);
 export const List = createIcon(LucideIcons.List);
 export const Link = createIcon(LucideIcons.Link);
+export const Unlink = createIcon(LucideIcons.Unlink);
 export const Lock = createIcon(LucideIcons.Lock);
 export const Printer = createIcon(LucideIcons.Printer);
 export const TrendingUp = createIcon(LucideIcons.TrendingUp);
@@ -92,6 +94,7 @@ export const ZoomIn = createIcon(LucideIcons.ZoomIn);
 export const ZoomOut = createIcon(LucideIcons.ZoomOut);
 export const GitMerge = createIcon(LucideIcons.GitMerge);
 export const ArrowLeft = createIcon(LucideIcons.ArrowLeft);
+export const ArrowRight = createIcon(LucideIcons.ArrowRight);
 export const Check = createIcon(LucideIcons.Check);
 export const Ban = createIcon(LucideIcons.Ban);
 export const History = createIcon(LucideIcons.History);
@@ -107,6 +110,8 @@ export const Package = createIcon(LucideIcons.Package);
 export const ExternalLink = createIcon(LucideIcons.ExternalLink);
 export const Cpu = createIcon(LucideIcons.Cpu);
 export const ArrowUpRight = createIcon(LucideIcons.ArrowUpRight);
+export const Diamond = createIcon(LucideIcons.Diamond);
+export const Eye = createIcon(LucideIcons.Eye);
 
 // Fix: Exporting missing icons needed for PerformanceMetrics
 export const PieChart = createIcon(LucideIcons.PieChart);
