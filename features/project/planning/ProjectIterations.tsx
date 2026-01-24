@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   MoreHorizontal, Plus, Layers, Link, Lock, Edit3, Printer, 
   Share2, Settings, CheckCircle2, Maximize2, Users, Calendar, 
@@ -276,7 +276,13 @@ export const ProjectIterations = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const selectedSprint = MOCK_SPRINTS.find(s => s.id === selectedSprintId) || MOCK_SPRINTS[1];
-    const filteredSprints = MOCK_SPRINTS.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    // Use useMemo to sort and filter sprints
+    const filteredSprints = useMemo(() => {
+        return MOCK_SPRINTS
+            .filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+            .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime()); // Sort descending by start date
+    }, [searchQuery]);
 
     return (
         <div className="flex h-full bg-white -m-6 overflow-hidden">
